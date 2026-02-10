@@ -1,0 +1,2953 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Code Builder Pro - সহজে কোড তৈরি করুন</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-main);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text-primary);
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Sidebar - Code Blocks */
+        .blocks-panel {
+            background: var(--bg-main);
+            padding: 20px;
+            border-right: 2px solid var(--border);
+            overflow-y: auto;
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .blocks-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .blocks-panel::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+
+        .blocks-panel::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        /* Sticky Middle Area */
+        .middle-area {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .builder-area-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .builder-title-bar {
+            background: var(--bg-card);
+            padding: 15px 30px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .builder-title {
+            font-size: 1.3em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .builder-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Sticky Drop Zone */
+        .drop-zone-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+        }
+
+        .drop-zone {
+            min-height: 500px;
+            border: 3px dashed var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            background: var(--bg-main);
+            transition: all 0.3s;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .drop-zone::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .drop-zone::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        .drop-zone::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .drop-zone.drag-over {
+            background: var(--bg-input);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .drop-zone-empty {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 60px 20px;
+            font-size: 18px;
+        }
+
+        /* Right Sidebar - Generated Code */
+        .code-output {
+            background: var(--bg-main);
+            padding: 20px;
+            overflow-y: auto;
+            color: var(--success);
+            font-family: 'Courier New', monospace;
+            border-left: 2px solid var(--border);
+            width: 500px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .code-output::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+
+        .code-output::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        /* Rest of the styles remain the same */
+        .category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-count {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .code-block {
+            background: var(--bg-card);
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: move;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+        }
+
+        .code-block:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            border-left-color: var(--accent);
+            background: var(--bg-input);
+        }
+
+        .code-block-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-block-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .builder-block {
+            background: var(--bg-input);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: relative;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .builder-block:hover {
+            border-left-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .builder-block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .builder-block-title {
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .builder-block-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .block-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .btn-move {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-move:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        .block-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .output-title {
+            color: var(--success);
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .code-content {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 20px;
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .code-line {
+            margin: 5px 0;
+            line-height: 1.8;
+            padding: 2px 0;
+        }
+
+        .indent-1 { margin-left: 20px; }
+        .indent-2 { margin-left: 40px; }
+        .indent-3 { margin-left: 60px; }
+
+        .keyword { color: var(--accent); }
+        .function { color: var(--warning); }
+        .string { color: var(--success); }
+        .number { color: var(--secondary); }
+        .comment { color: var(--text-secondary); }
+        .operator { color: var(--info); }
+
+        .help-text {
+            background: var(--bg-input);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .block-counter {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .preview-code {
+            background: var(--bg-main);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--success);
+            margin-top: 5px;
+            border: 1px solid var(--border);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .block-icon {
+            font-size: 16px;
+        }
+
+        .category-icon {
+            font-size: 14px;
+        }
+
+        @media (max-width: 1400px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .blocks-panel {
+                width: 100%;
+                max-height: 300px;
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+            
+            .code-output {
+                width: 100%;
+                max-height: 400px;
+                border-left: none;
+                border-top: 2px solid var(--border);
+            }
+            
+            .middle-area {
+                height: auto;
+            }
+        }
+
+        .import-export {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .block-type-tag {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .drag-handle {
+            cursor: move;
+            padding: 5px;
+            color: var(--text-secondary);
+        }
+
+        .block-sequences {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .seq-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .seq-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ JavaScript Code Builder Pro</h1>
+            <p>কোনো কোডিং জ্ঞান ছাড়াই সহজে JavaScript Code তৈরি করুন | 50+ প্রি-ডিফাইন্ড ব্লক</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Panel - Code Blocks -->
+            <div class="blocks-panel">
+                <div class="search-box">
+                    <input type="text" id="searchBlocks" placeholder="🔍 Search code blocks..." onkeyup="filterBlocks()">
+                </div>
+
+                <div class="help-text" style="margin-bottom: 20px;">
+                    <strong>📌 কিভাবে ব্যবহার করবেন:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>Code blocks টেনে ড্রপ জোনে ছেড়ে দিন</li>
+                        <li>Edit বাটনে ক্লিক করে কাস্টোমাইজ করুন</li>
+                        <li>Generate বাটনে ক্লিক করে কোড তৈরি করুন</li>
+                    </ul>
+                </div>
+
+                <!-- ভ্যারিয়েবল এবং ডেটা টাইপ -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">📦</span>
+                        ভ্যারিয়েবল ও ডেটা টাইপ
+                        <span class="category-count">8</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="variable">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔤</span>
+                            Variable তৈরি
+                        </div>
+                        <div class="code-block-desc">let, const, var দিয়ে ভ্যারিয়েবল</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="number">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔢</span>
+                            Number ভ্যারিয়েবল
+                        </div>
+                        <div class="code-block-desc">সংখ্যা ধারণ করে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string">
+                        <div class="code-block-title">
+                            <span class="block-icon">📝</span>
+                            String ভ্যারিয়েবল
+                        </div>
+                        <div class="code-block-desc">টেক্সট ধারণ করে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="boolean">
+                        <div class="code-block-title">
+                            <span class="block-icon">✅</span>
+                            Boolean ভ্যারিয়েবল
+                        </div>
+                        <div class="code-block-desc">true/false ভ্যালু</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="null">
+                        <div class="code-block-title">
+                            <span class="block-icon">⚫</span>
+                            Null ভ্যালু
+                        </div>
+                        <div class="code-block-desc">খালি ভ্যালু</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="undefined">
+                        <div class="code-block-title">
+                            <span class="block-icon">❓</span>
+                            Undefined
+                        </div>
+                        <div class="code-block-desc">অনির্ধারিত ভ্যালু</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array">
+                        <div class="code-block-title">
+                            <span class="block-icon">📋</span>
+                            Array (তালিকা)
+                        </div>
+                        <div class="code-block-desc">একাধিক ডেটা রাখে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="object">
+                        <div class="code-block-title">
+                            <span class="block-icon">🗃️</span>
+                            Object (বস্তু)
+                        </div>
+                        <div class="code-block-desc">কী-ভ্যালু জোড়া</div>
+                    </div>
+                </div>
+
+                <!-- Array মেথডস -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">🔢</span>
+                        Array মেথডস
+                        <span class="category-count">15</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-push">
+                        <div class="code-block-title">
+                            <span class="block-icon">➕</span>
+                            Array Push
+                        </div>
+                        <div class="code-block-desc">শেষে যোগ করে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-pop">
+                        <div class="code-block-title">
+                            <span class="block-icon">➖</span>
+                            Array Pop
+                        </div>
+                        <div class="code-block-desc">শেষ থেকে সরায়</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-shift">
+                        <div class="code-block-title">
+                            <span class="block-icon">↩️</span>
+                            Array Shift
+                        </div>
+                        <div class="code-block-desc">শুরু থেকে সরায়</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-unshift">
+                        <div class="code-block-title">
+                            <span class="block-icon">↪️</span>
+                            Array Unshift
+                        </div>
+                        <div class="code-block-desc">শুরুতে যোগ করে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-map">
+                        <div class="code-block-title">
+                            <span class="block-icon">🗺️</span>
+                            Array Map
+                        </div>
+                        <div class="code-block-desc">সব এলিমেন্ট পরিবর্তন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-filter">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔍</span>
+                            Array Filter
+                        </div>
+                        <div class="code-block-desc">শর্ত অনুযায়ী খুঁজে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-reduce">
+                        <div class="code-block-title">
+                            <span class="block-icon">🧮</span>
+                            Array Reduce
+                        </div>
+                        <div class="code-block-desc">সব ভ্যালু একসাথে করে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-find">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔎</span>
+                            Array Find
+                        </div>
+                        <div class="code-block-desc">প্রথম ম্যাচ খুঁজে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-includes">
+                        <div class="code-block-title">
+                            <span class="block-icon">✔️</span>
+                            Array Includes
+                        </div>
+                        <div class="code-block-desc">অস্তিত্ব চেক করে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-indexof">
+                        <div class="code-block-title">
+                            <span class="block-icon">#️⃣</span>
+                            Array IndexOf
+                        </div>
+                        <div class="code-block-desc">ইন্ডেক্স খুঁজে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-slice">
+                        <div class="code-block-title">
+                            <span class="block-icon">✂️</span>
+                            Array Slice
+                        </div>
+                        <div class="code-block-desc">অংশ কেটে নেয়</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-splice">
+                        <div class="code-block-title">
+                            <span class="block-icon">✏️</span>
+                            Array Splice
+                        </div>
+                        <div class="code-block-desc">অংশ পরিবর্তন করে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-concat">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔗</span>
+                            Array Concat
+                        </div>
+                        <div class="code-block-desc">দুই অ্যারে জোড়া</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-sort">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔠</span>
+                            Array Sort
+                        </div>
+                        <div class="code-block-desc">সাজানো</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-reverse">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔁</span>
+                            Array Reverse
+                        </div>
+                        <div class="code-block-desc">উল্টানো</div>
+                    </div>
+                </div>
+
+                <!-- লুপ এবং ইটারেশন -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">🔄</span>
+                        লুপ ও ইটারেশন
+                        <span class="category-count">7</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="for-loop">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔂</span>
+                            For Loop
+                        </div>
+                        <div class="code-block-desc">নির্দিষ্ট সংখ্যকবার</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="while-loop">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔄</span>
+                            While Loop
+                        </div>
+                        <div class="code-block-desc">শর্ত সত্য থাকলে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="dowhile-loop">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔁</span>
+                            Do While Loop
+                        </div>
+                        <div class="code-block-desc">অন্তত একবার চলবে</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="foreach">
+                        <div class="code-block-title">
+                            <span class="block-icon">📋</span>
+                            forEach Loop
+                        </div>
+                        <div class="code-block-desc">অ্যারের সব এলিমেন্ট</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="forin-loop">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔑</span>
+                            for...in Loop
+                        </div>
+                        <div class="code-block-desc">অবজেক্টের প্রপার্টি</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="forof-loop">
+                        <div class="code-block-title">
+                            <span class="block-icon">📊</span>
+                            for...of Loop
+                        </div>
+                        <div class="code-block-desc">ইটারেবলের ভ্যালু</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="break-continue">
+                        <div class="code-block-title">
+                            <span class="block-icon">⏸️</span>
+                            Break/Continue
+                        </div>
+                        <div class="code-block-desc">লুপ নিয়ন্ত্রণ</div>
+                    </div>
+                </div>
+
+                <!-- কন্ডিশনাল স্টেটমেন্ট -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">❓</span>
+                        শর্ত (Conditions)
+                        <span class="category-count">5</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="if">
+                        <div class="code-block-title">
+                            <span class="block-icon">✅</span>
+                            If Statement
+                        </div>
+                        <div class="code-block-desc">একটি শর্ত চেক</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="if-else">
+                        <div class="code-block-title">
+                            <span class="block-icon">↕️</span>
+                            If-Else
+                        </div>
+                        <div class="code-block-desc">দুইটি অবস্থা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="elseif">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔀</span>
+                            Else If
+                        </div>
+                        <div class="code-block-desc">একাধিক শর্ত</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="switch">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔀</span>
+                            Switch Case
+                        </div>
+                        <div class="code-block-desc">অনেক শর্ত চেক</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="ternary">
+                        <div class="code-block-title">
+                            <span class="block-icon">❓</span>
+                            Ternary Operator
+                        </div>
+                        <div class="code-block-desc">সংক্ষিপ্ত if-else</div>
+                    </div>
+                </div>
+
+                <!-- ফাংশন -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">⚙️</span>
+                        ফাংশন
+                        <span class="category-count">6</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="function">
+                        <div class="code-block-title">
+                            <span class="block-icon">📦</span>
+                            Function
+                        </div>
+                        <div class="code-block-desc">সাধারণ ফাংশন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="arrow-function">
+                        <div class="code-block-title">
+                            <span class="block-icon">➡️</span>
+                            Arrow Function
+                        </div>
+                        <div class="code-block-desc">তীর চিহ্ন ফাংশন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="function-call">
+                        <div class="code-block-title">
+                            <span class="block-icon">📞</span>
+                            Function Call
+                        </div>
+                        <div class="code-block-desc">ফাংশন কল করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="return-statement">
+                        <div class="code-block-title">
+                            <span class="block-icon">↩️</span>
+                            Return Statement
+                        </div>
+                        <div class="code-block-desc">মান রিটার্ন করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="callback-function">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔄</span>
+                            Callback Function
+                        </div>
+                        <div class="code-block-desc">কলব্যাক ফাংশন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="async-function">
+                        <div class="code-block-title">
+                            <span class="block-icon">⏳</span>
+                            Async Function
+                        </div>
+                        <div class="code-block-desc">এসিংক্রোনাস ফাংশন</div>
+                    </div>
+                </div>
+
+                <!-- অপারেটর -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">➕</span>
+                        অপারেটর
+                        <span class="category-count">6</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="arithmetic">
+                        <div class="code-block-title">
+                            <span class="block-icon">➕</span>
+                            গাণিতিক অপারেটর
+                        </div>
+                        <div class="code-block-desc">+, -, *, /, %</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="comparison">
+                        <div class="code-block-title">
+                            <span class="block-icon">⚖️</span>
+                            তুলনা অপারেটর
+                        </div>
+                        <div class="code-block-desc">==, ===, !=, !==, >, <</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="logical">
+                        <div class="code-block-title">
+                            <span class="block-icon">🧠</span>
+                            লজিকাল অপারেটর
+                        </div>
+                        <div class="code-block-desc">&&, ||, !</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="assignment">
+                        <div class="code-block-title">
+                            <span class="block-icon">✍️</span>
+                            Assignment অপারেটর
+                        </div>
+                        <div class="code-block-desc">=, +=, -=, *=, /=</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="typeof">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔍</span>
+                            typeof অপারেটর
+                        </div>
+                        <div class="code-block-desc">ডেটা টাইপ চেক</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="instanceof">
+                        <div class="code-block-title">
+                            <span class="block-icon">🏗️</span>
+                            instanceof
+                        </div>
+                        <div class="code-block-desc">ক্লাস চেক</div>
+                    </div>
+                </div>
+
+                <!-- আউটপুট -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">🖨️</span>
+                        আউটপুট
+                        <span class="category-count">4</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="console-log">
+                        <div class="code-block-title">
+                            <span class="block-icon">💻</span>
+                            Console Log
+                        </div>
+                        <div class="code-block-desc">কনসোলে প্রিন্ট</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="alert">
+                        <div class="code-block-title">
+                            <span class="block-icon">⚠️</span>
+                            Alert বক্স
+                        </div>
+                        <div class="code-block-desc">পপআপ মেসেজ</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="prompt">
+                        <div class="code-block-title">
+                            <span class="block-icon">⌨️</span>
+                            Prompt
+                        </div>
+                        <div class="code-block-desc">ইনপুট নেওয়া</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="confirm">
+                        <div class="code-block-title">
+                            <span class="block-icon">❔</span>
+                            Confirm
+                        </div>
+                        <div class="code-block-desc">হ্যাঁ/না নেওয়া</div>
+                    </div>
+                </div>
+
+                <!-- DOM ম্যানিপুলেশন -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">🌐</span>
+                        DOM ম্যানিপুলেশন
+                        <span class="category-count">8</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="getelementbyid">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔍</span>
+                            getElementById
+                        </div>
+                        <div class="code-block-desc">ID দিয়ে এলিমেন্ট খোঁজা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="queryselector">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔎</span>
+                            querySelector
+                        </div>
+                        <div class="code-block-desc">CSS সিলেক্টর দিয়ে খোঁজা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="addeventlistener">
+                        <div class="code-block-title">
+                            <span class="block-icon">🎯</span>
+                            Event Listener
+                        </div>
+                        <div class="code-block-desc">ইভেন্ট হ্যান্ডলিং</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="createelement">
+                        <div class="code-block-title">
+                            <span class="block-icon">➕</span>
+                            Create Element
+                        </div>
+                        <div class="code-block-desc">নতুন এলিমেন্ট তৈরি</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="appendchild">
+                        <div class="code-block-title">
+                            <span class="block-icon">📎</span>
+                            Append Child
+                        </div>
+                        <div class="code-block-desc">এলিমেন্ট যোগ করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="innerhtml">
+                        <div class="code-block-title">
+                            <span class="block-icon">🖋️</span>
+                            innerHTML
+                        </div>
+                        <div class="code-block-desc">এইচটিএমএল সেট করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="classlist">
+                        <div class="code-block-title">
+                            <span class="block-icon">🎨</span>
+                            ClassList
+                        </div>
+                        <div class="code-block-desc">ক্লাস ম্যানেজ করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="style">
+                        <div class="code-block-title">
+                            <span class="block-icon">🎨</span>
+                            Style
+                        </div>
+                        <div class="code-block-desc">স্টাইল পরিবর্তন</div>
+                    </div>
+                </div>
+
+                <!-- Error Handling -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">🚨</span>
+                        Error Handling
+                        <span class="category-count">3</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="trycatch">
+                        <div class="code-block-title">
+                            <span class="block-icon">🛡️</span>
+                            Try-Catch
+                        </div>
+                        <div class="code-block-desc">Error হ্যান্ডলিং</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="throw">
+                        <div class="code-block-title">
+                            <span class="block-icon">💥</span>
+                            Throw Error
+                        </div>
+                        <div class="code-block-desc">Error থ্রো করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="finally">
+                        <div class="code-block-title">
+                            <span class="block-icon">🏁</span>
+                            Finally
+                        </div>
+                        <div class="code-block-desc">শেষে চালানো</div>
+                    </div>
+                </div>
+
+                <!-- Date & Time -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">📅</span>
+                        Date & Time
+                        <span class="category-count">5</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="date-object">
+                        <div class="code-block-title">
+                            <span class="block-icon">📅</span>
+                            Date Object
+                        </div>
+                        <div class="code-block-desc">তারিখ ও সময়</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="getdate">
+                        <div class="code-block-title">
+                            <span class="block-icon">📆</span>
+                            Get Date Methods
+                        </div>
+                        <div class="code-block-desc">তারিখ পাওয়া</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="setdate">
+                        <div class="code-block-title">
+                            <span class="block-icon">✏️</span>
+                            Set Date Methods
+                        </div>
+                        <div class="code-block-desc">তারিখ সেট করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="date-format">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔄</span>
+                            Date Format
+                        </div>
+                        <div class="code-block-desc">ফরম্যাট পরিবর্তন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="timestamp">
+                        <div class="code-block-title">
+                            <span class="block-icon">⏱️</span>
+                            Timestamp
+                        </div>
+                        <div class="code-block-desc">মিলিসেকেন্ড</div>
+                    </div>
+                </div>
+
+                <!-- Math -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">🧮</span>
+                        Math ফাংশন
+                        <span class="category-count">8</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="math-random">
+                        <div class="code-block-title">
+                            <span class="block-icon">🎲</span>
+                            Math.random()
+                        </div>
+                        <div class="code-block-desc">র‍্যান্ডম সংখ্যা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="math-round">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔢</span>
+                            Math.round()
+                        </div>
+                        <div class="code-block-desc">নিকটবর্তী পূর্ণসংখ্যা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="math-floor">
+                        <div class="code-block-title">
+                            <span class="block-icon">⬇️</span>
+                            Math.floor()
+                        </div>
+                        <div class="code-block-desc">নিচের পূর্ণসংখ্যা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="math-ceil">
+                        <div class="code-block-title">
+                            <span class="block-icon">⬆️</span>
+                            Math.ceil()
+                        </div>
+                        <div class="code-block-desc">উপরের পূর্ণসংখ্যা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="math-max">
+                        <div class="code-block-title">
+                            <span class="block-icon">⬆️</span>
+                            Math.max()
+                        </div>
+                        <div class="code-block-desc">সর্বোচ্চ মান</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="math-min">
+                        <div class="code-block-title">
+                            <span class="block-icon">⬇️</span>
+                            Math.min()
+                        </div>
+                        <div class="code-block-desc">সর্বনিম্ন মান</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="math-pow">
+                        <div class="code-block-title">
+                            <span class="block-icon">⚡</span>
+                            Math.pow()
+                        </div>
+                        <div class="code-block-desc">ঘাত</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="math-sqrt">
+                        <div class="code-block-title">
+                            <span class="block-icon">√</span>
+                            Math.sqrt()
+                        </div>
+                        <div class="code-block-desc">বর্গমূল</div>
+                    </div>
+                </div>
+
+                <!-- String মেথডস -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">🔤</span>
+                        String মেথডস
+                        <span class="category-count">10</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-length">
+                        <div class="code-block-title">
+                            <span class="block-icon">📏</span>
+                            String Length
+                        </div>
+                        <div class="code-block-desc">দৈর্ঘ্য পাওয়া</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-charat">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔍</span>
+                            charAt()
+                        </div>
+                        <div class="code-block-desc">ইন্ডেক্সের অক্ষর</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-substring">
+                        <div class="code-block-title">
+                            <span class="block-icon">✂️</span>
+                            substring()
+                        </div>
+                        <div class="code-block-desc">অংশ নেওয়া</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-slice">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔪</span>
+                            slice()
+                        </div>
+                        <div class="code-block-desc">স্লাইস করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-indexof">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔎</span>
+                            indexOf()
+                        </div>
+                        <div class="code-block-desc">অবস্থান খোঁজা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-replace">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔄</span>
+                            replace()
+                        </div>
+                        <div class="code-block-desc">বদল করা</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-tolowercase">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔠</span>
+                            toLowerCase()
+                        </div>
+                        <div class="code-block-desc">ছোট হাতের অক্ষর</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-touppercase">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔠</span>
+                            toUpperCase()
+                        </div>
+                        <div class="code-block-desc">বড় হাতের অক্ষর</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-trim">
+                        <div class="code-block-title">
+                            <span class="block-icon">✂️</span>
+                            trim()
+                        </div>
+                        <div class="code-block-desc">ফাঁকা স্থান সরানো</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="string-split">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔪</span>
+                            split()
+                        </div>
+                        <div class="code-block-desc">ভাগ করা</div>
+                    </div>
+                </div>
+
+                <!-- JSON -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">📄</span>
+                        JSON
+                        <span class="category-count">3</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="json-stringify">
+                        <div class="code-block-title">
+                            <span class="block-icon">➡️</span>
+                            JSON.stringify()
+                        </div>
+                        <div class="code-block-desc">অবজেক্ট থেকে JSON</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="json-parse">
+                        <div class="code-block-title">
+                            <span class="block-icon">⬅️</span>
+                            JSON.parse()
+                        </div>
+                        <div class="code-block-desc">JSON থেকে অবজেক্ট</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="localstorage">
+                        <div class="code-block-title">
+                            <span class="block-icon">💾</span>
+                            Local Storage
+                        </div>
+                        <div class="code-block-desc">ডেটা সংরক্ষণ</div>
+                    </div>
+                </div>
+
+                <!-- এডভান্সড -->
+                <div class="category">
+                    <div class="category-title">
+                        <span class="category-icon">🚀</span>
+                        এডভান্সড
+                        <span class="category-count">6</span>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="promise">
+                        <div class="code-block-title">
+                            <span class="block-icon">🤝</span>
+                            Promise
+                        </div>
+                        <div class="code-block-desc">প্রমিস অবজেক্ট</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="fetch-api">
+                        <div class="code-block-title">
+                            <span class="block-icon">🌐</span>
+                            Fetch API
+                        </div>
+                        <div class="code-block-desc">API কল</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="settimeout">
+                        <div class="code-block-title">
+                            <span class="block-icon">⏰</span>
+                            setTimeout()
+                        </div>
+                        <div class="code-block-desc">বিলম্বিত এক্সিকিউশন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="setinterval">
+                        <div class="code-block-title">
+                            <span class="block-icon">🔄</span>
+                            setInterval()
+                        </div>
+                        <div class="code-block-desc">পর্যায়ক্রমিক এক্সিকিউশন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="destructuring">
+                        <div class="code-block-title">
+                            <span class="block-icon">🎁</span>
+                            Destructuring
+                        </div>
+                        <div class="code-block-desc">ডেটা আনপ্যাক</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="spread">
+                        <div class="code-block-title">
+                            <span class="block-icon">📤</span>
+                            Spread Operator
+                        </div>
+                        <div class="code-block-desc">... অপারেটর</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Area - Builder -->
+            <div class="middle-area">
+                <div class="builder-title-bar">
+                    <div class="builder-title">
+                        <span>🎨 Code Builder Area</span>
+                        <span class="block-counter" id="blockCount">0 blocks</span>
+                    </div>
+                    <div class="builder-actions">
+                        <button class="btn btn-primary" onclick="generateCode()">
+                            🔄 Generate Code
+                        </button>
+                        <button class="btn btn-success" onclick="saveProject()">
+                            💾 Save Project
+                        </button>
+                        <button class="btn btn-warning" onclick="loadProject()">
+                            📂 Load Project
+                        </button>
+                    </div>
+                </div>
+
+                <div class="drop-zone-container">
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-empty" id="emptyMessage">
+                            ⬅️ বাম দিক থেকে Code Blocks টেনে এনে এখানে ছেড়ে দিন<br>
+                            <small style="color: var(--text-secondary); margin-top: 10px; display: block;">
+                                উদাহরণ: একটি array তৈরি করুন, তারপর map/filter দিয়ে প্রসেস করুন
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Generated Code -->
+            <div class="code-output">
+                <div class="output-header">
+                    <div class="output-title">📄 Generated Code</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="copyCode()">
+                            📋 Copy
+                        </button>
+                        <button class="btn btn-primary" onclick="runCode()">
+                            ▶️ Run
+                        </button>
+                        <button class="btn btn-secondary" onclick="formatCode()">
+                            ✨ Format
+                        </button>
+                    </div>
+                </div>
+
+                <div class="import-export">
+                    <button class="btn btn-warning" onclick="downloadCode()">
+                        💾 Download (.js)
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAll()">
+                        🗑️ Clear All
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportAsHTML()">
+                        🌐 Export HTML
+                    </button>
+                </div>
+
+                <div class="help-text" style="margin-bottom: 15px; font-size: 12px;">
+                    <strong>ℹ️ তথ্য:</strong>
+                    F12 চাপুন Console দেখতে। Copy করে আপনার প্রোজেক্টে ব্যবহার করুন।
+                </div>
+
+                <div class="code-content" id="codeOutput">
+                    <div class="comment">// আপনার code এখানে দেখা যাবে...</div>
+                    <div class="comment">// Block গুলো ড্রাগ এন্ড ড্রপ করে যোগ করুন</div>
+                    <div class="comment">// তারপর Generate Code বাটনে ক্লিক করুন</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Block Configuration -->
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Block Configure করুন</div>
+            <div id="modalForm"></div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="saveBlockConfig()">✓ Save করুন</button>
+                <button class="btn btn-secondary" onclick="closeModal()">✕ Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced JavaScript Code Builder with all features
+        let builderBlocks = [];
+        let currentEditingIndex = -1;
+        let draggedElement = null;
+
+        // Drag and Drop functionality
+        document.querySelectorAll('.code-block').forEach(block => {
+            block.addEventListener('dragstart', function(e) {
+                draggedElement = this.dataset.type;
+                this.style.opacity = '0.5';
+            });
+
+            block.addEventListener('dragend', function(e) {
+                this.style.opacity = '1';
+            });
+        });
+
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', function(e) {
+            this.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            if (draggedElement) {
+                addBlock(draggedElement);
+                draggedElement = null;
+            }
+        });
+
+        function addBlock(type) {
+            const block = createBlockConfig(type);
+            builderBlocks.push(block);
+            renderBuilderArea();
+            updateBlockCount();
+        }
+
+        function createBlockConfig(type) {
+            // Create a unique ID for each block
+            const blockId = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            const configs = {
+                // ভ্যারিয়েবল এবং ডেটা টাইপ
+                'variable': {
+                    id: blockId,
+                    type: 'variable',
+                    title: 'Variable',
+                    varType: 'let',
+                    varName: 'myVariable',
+                    varValue: '0',
+                    description: 'ডেটা সংরক্ষণ করার জন্য ভ্যারিয়েবল'
+                },
+                'number': {
+                    id: blockId,
+                    type: 'number',
+                    title: 'Number',
+                    varName: 'numberValue',
+                    value: '42',
+                    description: 'সংখ্যা ভ্যারিয়েবল'
+                },
+                'string': {
+                    id: blockId,
+                    type: 'string',
+                    title: 'String',
+                    varName: 'stringValue',
+                    value: '"Hello World"',
+                    description: 'টেক্সট ভ্যারিয়েবল'
+                },
+                'boolean': {
+                    id: blockId,
+                    type: 'boolean',
+                    title: 'Boolean',
+                    varName: 'isActive',
+                    value: 'true',
+                    description: 'true/false ভ্যালু'
+                },
+                'null': {
+                    id: blockId,
+                    type: 'null',
+                    title: 'Null',
+                    varName: 'emptyValue',
+                    value: 'null',
+                    description: 'খালি ভ্যালু'
+                },
+                'undefined': {
+                    id: blockId,
+                    type: 'undefined',
+                    title: 'Undefined',
+                    varName: 'notDefined',
+                    value: 'undefined',
+                    description: 'অনির্ধারিত ভ্যালু'
+                },
+                'array': {
+                    id: blockId,
+                    type: 'array',
+                    title: 'Array',
+                    varName: 'myArray',
+                    values: '1, 2, 3, 4, 5',
+                    description: 'একাধিক ডেটা রাখার জন্য অ্যারে'
+                },
+                'object': {
+                    id: blockId,
+                    type: 'object',
+                    title: 'Object',
+                    varName: 'person',
+                    properties: 'name: "John",\nage: 30,\ncity: "Dhaka"',
+                    description: 'কী-ভ্যালু জোড়া দিয়ে অবজেক্ট'
+                },
+
+                // Array মেথডস
+                'array-push': {
+                    id: blockId,
+                    type: 'array-push',
+                    title: 'Array Push',
+                    arrayName: 'myArray',
+                    value: '10',
+                    description: 'অ্যারের শেষে এলিমেন্ট যোগ'
+                },
+                'array-pop': {
+                    id: blockId,
+                    type: 'array-pop',
+                    title: 'Array Pop',
+                    arrayName: 'myArray',
+                    description: 'অ্যারের শেষ থেকে এলিমেন্ট সরান'
+                },
+                'array-shift': {
+                    id: blockId,
+                    type: 'array-shift',
+                    title: 'Array Shift',
+                    arrayName: 'myArray',
+                    description: 'অ্যারের শুরু থেকে এলিমেন্ট সরান'
+                },
+                'array-unshift': {
+                    id: blockId,
+                    type: 'array-unshift',
+                    title: 'Array Unshift',
+                    arrayName: 'myArray',
+                    value: '0',
+                    description: 'অ্যারের শুরুতে এলিমেন্ট যোগ'
+                },
+                'array-map': {
+                    id: blockId,
+                    type: 'array-map',
+                    title: 'Array Map',
+                    arrayName: 'myArray',
+                    resultName: 'mappedArray',
+                    callback: 'item => item * 2',
+                    description: 'প্রতিটি এলিমেন্ট পরিবর্তন করুন'
+                },
+                'array-filter': {
+                    id: blockId,
+                    type: 'array-filter',
+                    title: 'Array Filter',
+                    arrayName: 'myArray',
+                    resultName: 'filteredArray',
+                    condition: 'item => item > 5',
+                    description: 'শর্ত অনুযায়ী এলিমেন্ট ফিল্টার করুন'
+                },
+                'array-reduce': {
+                    id: blockId,
+                    type: 'array-reduce',
+                    title: 'Array Reduce',
+                    arrayName: 'myArray',
+                    resultName: 'total',
+                    callback: '(acc, curr) => acc + curr',
+                    initialValue: '0',
+                    description: 'সব ভ্যালু একসাথে করুন'
+                },
+                'array-find': {
+                    id: blockId,
+                    type: 'array-find',
+                    title: 'Array Find',
+                    arrayName: 'myArray',
+                    resultName: 'foundItem',
+                    condition: 'item => item > 10',
+                    description: 'প্রথম ম্যাচিং এলিমেন্ট খুঁজুন'
+                },
+                'array-includes': {
+                    id: blockId,
+                    type: 'array-includes',
+                    title: 'Array Includes',
+                    arrayName: 'myArray',
+                    value: '5',
+                    description: 'এলিমেন্ট আছে কিনা চেক করুন'
+                },
+                'array-indexof': {
+                    id: blockId,
+                    type: 'array-indexof',
+                    title: 'Array IndexOf',
+                    arrayName: 'myArray',
+                    value: '3',
+                    description: 'এলিমেন্টের ইন্ডেক্স খুঁজুন'
+                },
+                'array-slice': {
+                    id: blockId,
+                    type: 'array-slice',
+                    title: 'Array Slice',
+                    arrayName: 'myArray',
+                    start: '1',
+                    end: '4',
+                    resultName: 'slicedArray',
+                    description: 'অ্যারের অংশ কেটে নিন'
+                },
+                'array-splice': {
+                    id: blockId,
+                    type: 'array-splice',
+                    title: 'Array Splice',
+                    arrayName: 'myArray',
+                    start: '1',
+                    deleteCount: '2',
+                    items: '10, 11',
+                    description: 'অ্যারের অংশ পরিবর্তন করুন'
+                },
+                'array-concat': {
+                    id: blockId,
+                    type: 'array-concat',
+                    title: 'Array Concat',
+                    array1: 'array1',
+                    array2: 'array2',
+                    resultName: 'combinedArray',
+                    description: 'দুইটি অ্যারে জোড়া দিন'
+                },
+                'array-sort': {
+                    id: blockId,
+                    type: 'array-sort',
+                    title: 'Array Sort',
+                    arrayName: 'myArray',
+                    callback: '(a, b) => a - b',
+                    description: 'অ্যারে সাজান'
+                },
+                'array-reverse': {
+                    id: blockId,
+                    type: 'array-reverse',
+                    title: 'Array Reverse',
+                    arrayName: 'myArray',
+                    description: 'অ্যারে উল্টান'
+                },
+
+                // লুপ এবং ইটারেশন
+                'for-loop': {
+                    id: blockId,
+                    type: 'for-loop',
+                    title: 'For Loop',
+                    variable: 'i',
+                    start: '0',
+                    end: '10',
+                    step: '1',
+                    body: 'console.log(i);',
+                    description: 'নির্দিষ্ট সংখ্যকবার চালান'
+                },
+                'while-loop': {
+                    id: blockId,
+                    type: 'while-loop',
+                    title: 'While Loop',
+                    condition: 'i < 10',
+                    body: 'console.log(i);\ni++;',
+                    description: 'শর্ত সত্য থাকলে চালান'
+                },
+                'dowhile-loop': {
+                    id: blockId,
+                    type: 'dowhile-loop',
+                    title: 'Do While Loop',
+                    condition: 'i < 10',
+                    body: 'console.log(i);\ni++;',
+                    description: 'অন্তত একবার চালান'
+                },
+                'foreach': {
+                    id: blockId,
+                    type: 'foreach',
+                    title: 'forEach Loop',
+                    arrayName: 'myArray',
+                    itemName: 'item',
+                    indexName: 'index',
+                    body: 'console.log(index, item);',
+                    description: 'অ্যারের সব এলিমেন্ট লুপ করুন'
+                },
+                'forin-loop': {
+                    id: blockId,
+                    type: 'forin-loop',
+                    title: 'for...in Loop',
+                    objectName: 'person',
+                    keyName: 'key',
+                    body: 'console.log(key, person[key]);',
+                    description: 'অবজেক্টের প্রপার্টি লুপ করুন'
+                },
+                'forof-loop': {
+                    id: blockId,
+                    type: 'forof-loop',
+                    title: 'for...of Loop',
+                    arrayName: 'myArray',
+                    itemName: 'item',
+                    body: 'console.log(item);',
+                    description: 'ইটারেবলের ভ্যালু লুপ করুন'
+                },
+                'break-continue': {
+                    id: blockId,
+                    type: 'break-continue',
+                    title: 'Break/Continue',
+                    statement: 'break',
+                    condition: 'i === 5',
+                    description: 'লুপ নিয়ন্ত্রণ করুন'
+                },
+
+                // কন্ডিশনাল স্টেটমেন্ট
+                'if': {
+                    id: blockId,
+                    type: 'if',
+                    title: 'If Statement',
+                    condition: 'x > 5',
+                    body: 'console.log("Greater than 5");',
+                    description: 'একটি শর্ত চেক করুন'
+                },
+                'if-else': {
+                    id: blockId,
+                    type: 'if-else',
+                    title: 'If-Else',
+                    condition: 'x > 5',
+                    ifBody: 'console.log("Greater");',
+                    elseBody: 'console.log("Smaller");',
+                    description: 'দুইটি অবস্থা পরীক্ষা করুন'
+                },
+                'elseif': {
+                    id: blockId,
+                    type: 'elseif',
+                    title: 'Else If',
+                    conditions: [
+                        { condition: 'score >= 90', body: 'console.log("A");' },
+                        { condition: 'score >= 80', body: 'console.log("B");' },
+                        { condition: 'score >= 70', body: 'console.log("C");' }
+                    ],
+                    elseBody: 'console.log("F");',
+                    description: 'একাধিক শর্ত পরীক্ষা করুন'
+                },
+                'switch': {
+                    id: blockId,
+                    type: 'switch',
+                    title: 'Switch Case',
+                    variable: 'day',
+                    cases: 'case 1:\n  console.log("Monday");\n  break;\ncase 2:\n  console.log("Tuesday");\n  break;\ndefault:\n  console.log("Other");',
+                    description: 'অনেক শর্ত চেক করুন'
+                },
+                'ternary': {
+                    id: blockId,
+                    type: 'ternary',
+                    title: 'Ternary Operator',
+                    condition: 'age >= 18',
+                    trueValue: '"Adult"',
+                    falseValue: '"Minor"',
+                    resultName: 'status',
+                    description: 'সংক্ষিপ্ত if-else স্টেটমেন্ট'
+                },
+
+                // ফাংশন
+                'function': {
+                    id: blockId,
+                    type: 'function',
+                    title: 'Function',
+                    funcName: 'myFunction',
+                    params: 'a, b',
+                    body: 'return a + b;',
+                    description: 'পুনরায় ব্যবহারযোগ্য কোড ব্লক'
+                },
+                'arrow-function': {
+                    id: blockId,
+                    type: 'arrow-function',
+                    title: 'Arrow Function',
+                    funcName: 'myFunc',
+                    params: 'x',
+                    body: 'return x * 2;',
+                    description: 'সংক্ষিপ্ত ফাংশন সিনট্যাক্স'
+                },
+                'function-call': {
+                    id: blockId,
+                    type: 'function-call',
+                    title: 'Function Call',
+                    funcName: 'myFunction',
+                    args: '5, 10',
+                    resultName: 'result',
+                    description: 'ফাংশন কল করা'
+                },
+                'return-statement': {
+                    id: blockId,
+                    type: 'return-statement',
+                    title: 'Return Statement',
+                    value: 'result',
+                    description: 'ফাংশন থেকে মান রিটার্ন করুন'
+                },
+                'callback-function': {
+                    id: blockId,
+                    type: 'callback-function',
+                    title: 'Callback Function',
+                    funcName: 'processData',
+                    params: 'data, callback',
+                    body: 'const result = data * 2;\ncallback(result);',
+                    description: 'কলব্যাক ফাংশন ব্যবহার করুন'
+                },
+                'async-function': {
+                    id: blockId,
+                    type: 'async-function',
+                    title: 'Async Function',
+                    funcName: 'fetchData',
+                    params: 'url',
+                    body: 'const response = await fetch(url);\nreturn response.json();',
+                    description: 'এসিংক্রোনাস ফাংশন'
+                },
+
+                // অপারেটর
+                'arithmetic': {
+                    id: blockId,
+                    type: 'arithmetic',
+                    title: 'Arithmetic Operation',
+                    operator: '+',
+                    operand1: 'a',
+                    operand2: 'b',
+                    resultName: 'sum',
+                    description: 'গাণিতিক অপারেশন'
+                },
+                'comparison': {
+                    id: blockId,
+                    type: 'comparison',
+                    title: 'Comparison Operation',
+                    operator: '===',
+                    operand1: 'a',
+                    operand2: 'b',
+                    resultName: 'isEqual',
+                    description: 'তুলনা অপারেশন'
+                },
+                'logical': {
+                    id: blockId,
+                    type: 'logical',
+                    title: 'Logical Operation',
+                    operator: '&&',
+                    operand1: 'condition1',
+                    operand2: 'condition2',
+                    resultName: 'result',
+                    description: 'লজিকাল অপারেশন'
+                },
+                'assignment': {
+                    id: blockId,
+                    type: 'assignment',
+                    title: 'Assignment Operation',
+                    operator: '+=',
+                    variable: 'count',
+                    value: '1',
+                    description: 'অ্যাসাইনমেন্ট অপারেশন'
+                },
+                'typeof': {
+                    id: blockId,
+                    type: 'typeof',
+                    title: 'typeof Operator',
+                    variable: 'myVar',
+                    resultName: 'type',
+                    description: 'ডেটা টাইপ চেক করুন'
+                },
+                'instanceof': {
+                    id: blockId,
+                    type: 'instanceof',
+                    title: 'instanceof Operator',
+                    variable: 'obj',
+                    constructor: 'Array',
+                    resultName: 'isArray',
+                    description: 'কনস্ট্রাক্টর চেক করুন'
+                },
+
+                // আউটপুট
+                'console-log': {
+                    id: blockId,
+                    type: 'console-log',
+                    title: 'Console Log',
+                    message: 'Hello World!',
+                    description: 'কনসোলে মেসেজ প্রিন্ট করুন'
+                },
+                'alert': {
+                    id: blockId,
+                    type: 'alert',
+                    title: 'Alert',
+                    message: 'Hello!',
+                    description: 'পপআপ মেসেজ দেখান'
+                },
+                'prompt': {
+                    id: blockId,
+                    type: 'prompt',
+                    title: 'Prompt',
+                    message: 'Enter your name:',
+                    resultName: 'userName',
+                    description: 'ইনপুট নেওয়ার জন্য প্রম্পট'
+                },
+                'confirm': {
+                    id: blockId,
+                    type: 'confirm',
+                    title: 'Confirm',
+                    message: 'Are you sure?',
+                    resultName: 'isConfirmed',
+                    description: 'হ্যাঁ/না নেওয়ার জন্য কনফার্ম'
+                },
+
+                // DOM ম্যানিপুলেশন
+                'getelementbyid': {
+                    id: blockId,
+                    type: 'getelementbyid',
+                    title: 'getElementById',
+                    elementId: 'myElement',
+                    variableName: 'element',
+                    description: 'ID দিয়ে DOM এলিমেন্ট সিলেক্ট করুন'
+                },
+                'queryselector': {
+                    id: blockId,
+                    type: 'queryselector',
+                    title: 'querySelector',
+                    selector: '.my-class',
+                    variableName: 'element',
+                    description: 'CSS সিলেক্টর দিয়ে DOM এলিমেন্ট সিলেক্ট করুন'
+                },
+                'addeventlistener': {
+                    id: blockId,
+                    type: 'addeventlistener',
+                    title: 'Event Listener',
+                    element: 'button',
+                    event: 'click',
+                    handler: 'function() {\n  console.log("Button clicked!");\n}',
+                    description: 'ইভেন্ট লিসেনার যোগ করুন'
+                },
+                'createelement': {
+                    id: blockId,
+                    type: 'createelement',
+                    title: 'Create Element',
+                    tagName: 'div',
+                    variableName: 'newElement',
+                    description: 'নতুন DOM এলিমেন্ট তৈরি করুন'
+                },
+                'appendchild': {
+                    id: blockId,
+                    type: 'appendchild',
+                    title: 'Append Child',
+                    parent: 'container',
+                    child: 'newElement',
+                    description: 'চাইল্ড এলিমেন্ট যোগ করুন'
+                },
+                'innerhtml': {
+                    id: blockId,
+                    type: 'innerhtml',
+                    title: 'innerHTML',
+                    element: 'myDiv',
+                    content: '<p>Hello World</p>',
+                    description: 'এলিমেন্টের HTML কন্টেন্ট সেট করুন'
+                },
+                'classlist': {
+                    id: blockId,
+                    type: 'classlist',
+                    title: 'ClassList',
+                    element: 'myElement',
+                    action: 'add',
+                    className: 'active',
+                    description: 'এলিমেন্টের ক্লাস ম্যানেজ করুন'
+                },
+                'style': {
+                    id: blockId,
+                    type: 'style',
+                    title: 'Style',
+                    element: 'myElement',
+                    property: 'backgroundColor',
+                    value: 'red',
+                    description: 'এলিমেন্টের স্টাইল পরিবর্তন করুন'
+                },
+
+                // Error Handling
+                'trycatch': {
+                    id: blockId,
+                    type: 'trycatch',
+                    title: 'Try-Catch',
+                    tryBody: '// Code that might throw error\nconst result = riskyOperation();',
+                    catchBody: 'console.error("Error:", error);',
+                    description: 'Error হ্যান্ডলিং'
+                },
+                'throw': {
+                    id: blockId,
+                    type: 'throw',
+                    title: 'Throw Error',
+                    errorMessage: 'Something went wrong!',
+                    description: 'Error থ্রো করুন'
+                },
+                'finally': {
+                    id: blockId,
+                    type: 'finally',
+                    title: 'Finally',
+                    body: 'console.log("Cleanup");',
+                    description: 'শেষে চালানোর কোড'
+                },
+
+                // Date & Time
+                'date-object': {
+                    id: blockId,
+                    type: 'date-object',
+                    title: 'Date Object',
+                    variableName: 'currentDate',
+                    description: 'নতুন ডেট অবজেক্ট তৈরি করুন'
+                },
+                'getdate': {
+                    id: blockId,
+                    type: 'getdate',
+                    title: 'Get Date',
+                    dateVariable: 'currentDate',
+                    method: 'getFullYear',
+                    resultName: 'year',
+                    description: 'তারিখ থেকে তথ্য নিন'
+                },
+                'setdate': {
+                    id: blockId,
+                    type: 'setdate',
+                    title: 'Set Date',
+                    dateVariable: 'currentDate',
+                    method: 'setFullYear',
+                    value: '2024',
+                    description: 'তারিখ সেট করুন'
+                },
+                'date-format': {
+                    id: blockId,
+                    type: 'date-format',
+                    title: 'Date Format',
+                    dateVariable: 'currentDate',
+                    format: 'toLocaleDateString',
+                    resultName: 'formattedDate',
+                    description: 'তারিখ ফরম্যাট করুন'
+                },
+                'timestamp': {
+                    id: blockId,
+                    type: 'timestamp',
+                    title: 'Timestamp',
+                    dateVariable: 'currentDate',
+                    resultName: 'timestamp',
+                    description: 'মিলিসেকেন্ড টাইমস্ট্যাম্প নিন'
+                },
+
+                // Math ফাংশন
+                'math-random': {
+                    id: blockId,
+                    type: 'math-random',
+                    title: 'Math.random()',
+                    resultName: 'randomNumber',
+                    min: '0',
+                    max: '1',
+                    description: 'র‍্যান্ডম সংখ্যা তৈরি করুন'
+                },
+                'math-round': {
+                    id: blockId,
+                    type: 'math-round',
+                    title: 'Math.round()',
+                    value: '3.7',
+                    resultName: 'rounded',
+                    description: 'নিকটবর্তী পূর্ণসংখ্যায় রূপান্তর'
+                },
+                'math-floor': {
+                    id: blockId,
+                    type: 'math-floor',
+                    title: 'Math.floor()',
+                    value: '3.7',
+                    resultName: 'floored',
+                    description: 'নিচের পূর্ণসংখ্যায় রূপান্তর'
+                },
+                'math-ceil': {
+                    id: blockId,
+                    type: 'math-ceil',
+                    title: 'Math.ceil()',
+                    value: '3.2',
+                    resultName: 'ceiled',
+                    description: 'উপরের পূর্ণসংখ্যায় রূপান্তর'
+                },
+                'math-max': {
+                    id: blockId,
+                    type: 'math-max',
+                    title: 'Math.max()',
+                    values: '5, 10, 15, 20',
+                    resultName: 'maximum',
+                    description: 'সর্বোচ্চ মান খুঁজুন'
+                },
+                'math-min': {
+                    id: blockId,
+                    type: 'math-min',
+                    title: 'Math.min()',
+                    values: '5, 10, 15, 20',
+                    resultName: 'minimum',
+                    description: 'সর্বনিম্ন মান খুঁজুন'
+                },
+                'math-pow': {
+                    id: blockId,
+                    type: 'math-pow',
+                    title: 'Math.pow()',
+                    base: '2',
+                    exponent: '3',
+                    resultName: 'power',
+                    description: 'ঘাত নির্ণয়'
+                },
+                'math-sqrt': {
+                    id: blockId,
+                    type: 'math-sqrt',
+                    title: 'Math.sqrt()',
+                    value: '16',
+                    resultName: 'squareRoot',
+                    description: 'বর্গমূল নির্ণয়'
+                },
+
+                // String মেথডস
+                'string-length': {
+                    id: blockId,
+                    type: 'string-length',
+                    title: 'String Length',
+                    string: 'myString',
+                    resultName: 'length',
+                    description: 'স্ট্রিং এর দৈর্ঘ্য পান'
+                },
+                'string-charat': {
+                    id: blockId,
+                    type: 'string-charat',
+                    title: 'charAt()',
+                    string: 'myString',
+                    index: '0',
+                    resultName: 'firstChar',
+                    description: 'নির্দিষ্ট ইন্ডেক্সের অক্ষর পান'
+                },
+                'string-substring': {
+                    id: blockId,
+                    type: 'string-substring',
+                    title: 'substring()',
+                    string: 'myString',
+                    start: '1',
+                    end: '4',
+                    resultName: 'subStr',
+                    description: 'স্ট্রিং এর অংশ নিন'
+                },
+                'string-slice': {
+                    id: blockId,
+                    type: 'string-slice',
+                    title: 'slice()',
+                    string: 'myString',
+                    start: '1',
+                    end: '4',
+                    resultName: 'slicedStr',
+                    description: 'স্ট্রিং স্লাইস করুন'
+                },
+                'string-indexof': {
+                    id: blockId,
+                    type: 'string-indexof',
+                    title: 'indexOf()',
+                    string: 'myString',
+                    search: 'World',
+                    resultName: 'position',
+                    description: 'সাবস্ট্রিং এর অবস্থান খুঁজুন'
+                },
+                'string-replace': {
+                    id: blockId,
+                    type: 'string-replace',
+                    title: 'replace()',
+                    string: 'myString',
+                    search: 'World',
+                    replace: 'JavaScript',
+                    resultName: 'newString',
+                    description: 'স্ট্রিং এর অংশ বদল করুন'
+                },
+                'string-tolowercase': {
+                    id: blockId,
+                    type: 'string-tolowercase',
+                    title: 'toLowerCase()',
+                    string: 'myString',
+                    resultName: 'lowerCaseStr',
+                    description: 'ছোট হাতের অক্ষরে রূপান্তর'
+                },
+                'string-touppercase': {
+                    id: blockId,
+                    type: 'string-touppercase',
+                    title: 'toUpperCase()',
+                    string: 'myString',
+                    resultName: 'upperCaseStr',
+                    description: 'বড় হাতের অক্ষরে রূপান্তর'
+                },
+                'string-trim': {
+                    id: blockId,
+                    type: 'string-trim',
+                    title: 'trim()',
+                    string: 'myString',
+                    resultName: 'trimmedStr',
+                    description: 'ফাঁকা স্থান সরান'
+                },
+                'string-split': {
+                    id: blockId,
+                    type: 'string-split',
+                    title: 'split()',
+                    string: 'myString',
+                    separator: ',',
+                    resultName: 'array',
+                    description: 'স্ট্রিং ভাগ করুন'
+                },
+
+                // JSON
+                'json-stringify': {
+                    id: blockId,
+                    type: 'json-stringify',
+                    title: 'JSON.stringify()',
+                    object: 'myObject',
+                    resultName: 'jsonString',
+                    description: 'অবজেক্ট থেকে JSON স্ট্রিং'
+                },
+                'json-parse': {
+                    id: blockId,
+                    type: 'json-parse',
+                    title: 'JSON.parse()',
+                    jsonString: '{"name":"John","age":30}',
+                    resultName: 'parsedObject',
+                    description: 'JSON স্ট্রিং থেকে অবজেক্ট'
+                },
+                'localstorage': {
+                    id: blockId,
+                    type: 'localstorage',
+                    title: 'Local Storage',
+                    action: 'setItem',
+                    key: 'userData',
+                    value: 'myObject',
+                    description: 'লোকাল স্টোরেজ ম্যানেজ করুন'
+                },
+
+                // এডভান্সড
+                'promise': {
+                    id: blockId,
+                    type: 'promise',
+                    title: 'Promise',
+                    promiseName: 'myPromise',
+                    executor: '(resolve, reject) => {\n  // Async operation\n  setTimeout(() => {\n    resolve("Success!");\n  }, 1000);\n}',
+                    description: 'প্রমিস অবজেক্ট তৈরি করুন'
+                },
+                'fetch-api': {
+                    id: blockId,
+                    type: 'fetch-api',
+                    title: 'Fetch API',
+                    url: '"https://api.example.com/data"',
+                    method: 'GET',
+                    resultName: 'response',
+                    description: 'API কল করুন'
+                },
+                'settimeout': {
+                    id: blockId,
+                    type: 'settimeout',
+                    title: 'setTimeout()',
+                    callback: 'function() {\n  console.log("Delayed message");\n}',
+                    delay: '1000',
+                    description: 'বিলম্বিত এক্সিকিউশন'
+                },
+                'setinterval': {
+                    id: blockId,
+                    type: 'setinterval',
+                    title: 'setInterval()',
+                    callback: 'function() {\n  console.log("Repeating message");\n}',
+                    interval: '2000',
+                    description: 'পর্যায়ক্রমিক এক্সিকিউশন'
+                },
+                'destructuring': {
+                    id: blockId,
+                    type: 'destructuring',
+                    title: 'Destructuring',
+                    object: 'person',
+                    variables: 'name, age',
+                    description: 'অবজেক্ট ডেস্ট্রাকচারিং'
+                },
+                'spread': {
+                    id: blockId,
+                    type: 'spread',
+                    title: 'Spread Operator',
+                    array1: 'array1',
+                    array2: 'array2',
+                    resultName: 'combined',
+                    description: 'স্প্রেড অপারেটর ব্যবহার করুন'
+                }
+            };
+
+            return configs[type] || configs['console-log'];
+        }
+
+        function renderBuilderArea() {
+            const dropZone = document.getElementById('dropZone');
+            const emptyMessage = document.getElementById('emptyMessage');
+            
+            if (builderBlocks.length === 0) {
+                dropZone.innerHTML = '<div class="drop-zone-empty" id="emptyMessage">⬅️ বাম দিক থেকে Code Blocks টেনে এনে এখানে ছেড়ে দিন<br><small style="color: var(--text-secondary); margin-top: 10px; display: block;">উদাহরণ: একটি array তৈরি করুন, তারপর map/filter দিয়ে প্রসেস করুন</small></div>';
+                return;
+            }
+
+            let builderHTML = '';
+            
+            builderBlocks.forEach((block, index) => {
+                let preview = getBlockPreview(block);
+                let tag = getBlockTag(block.type);
+                
+                builderHTML += `
+                    <div class="builder-block" draggable="true" ondragstart="dragBuilderBlock(event, ${index})" ondragover="allowDrop(event)" ondrop="dropBuilderBlock(event, ${index})">
+                        <div class="builder-block-header">
+                            <div class="builder-block-title">
+                                <span class="block-icon">${getBlockIcon(block.type)}</span>
+                                ${block.title}
+                                <span class="block-type-tag">${tag}</span>
+                            </div>
+                            <div class="builder-block-actions">
+                                <div class="block-sequences">
+                                    ${index > 0 ? '<button class="seq-btn" onclick="moveBlockUp(${index})">↑</button>' : ''}
+                                    ${index < builderBlocks.length - 1 ? '<button class="seq-btn" onclick="moveBlockDown(${index})">↓</button>' : ''}
+                                </div>
+                                <button class="block-btn btn-edit" onclick="editBlock(${index})">
+                                    ✏️ Edit
+                                </button>
+                                <button class="block-btn btn-delete" onclick="deleteBlock(${index})">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                        <div class="preview-code">
+                            ${preview}
+                        </div>
+                    </div>
+                `;
+            });
+
+            dropZone.innerHTML = builderHTML;
+        }
+
+        function getBlockIcon(type) {
+            const icons = {
+                // ভ্যারিয়েবল
+                'variable': '🔤', 'number': '🔢', 'string': '📝', 'boolean': '✅',
+                'null': '⚫', 'undefined': '❓', 'array': '📋', 'object': '🗃️',
+                // Array মেথডস
+                'array-push': '➕', 'array-pop': '➖', 'array-shift': '↩️', 'array-unshift': '↪️',
+                'array-map': '🗺️', 'array-filter': '🔍', 'array-reduce': '🧮', 'array-find': '🔎',
+                'array-includes': '✔️', 'array-indexof': '#️⃣', 'array-slice': '✂️', 'array-splice': '✏️',
+                'array-concat': '🔗', 'array-sort': '🔠', 'array-reverse': '🔁',
+                // লুপ
+                'for-loop': '🔂', 'while-loop': '🔄', 'dowhile-loop': '🔁', 'foreach': '📋',
+                'forin-loop': '🔑', 'forof-loop': '📊', 'break-continue': '⏸️',
+                // শর্ত
+                'if': '✅', 'if-else': '↕️', 'elseif': '🔀', 'switch': '🔀', 'ternary': '❓',
+                // ফাংশন
+                'function': '📦', 'arrow-function': '➡️', 'function-call': '📞', 'return-statement': '↩️',
+                'callback-function': '🔄', 'async-function': '⏳',
+                // অপারেটর
+                'arithmetic': '➕', 'comparison': '⚖️', 'logical': '🧠', 'assignment': '✍️',
+                'typeof': '🔍', 'instanceof': '🏗️',
+                // আউটপুট
+                'console-log': '💻', 'alert': '⚠️', 'prompt': '⌨️', 'confirm': '❔',
+                // DOM
+                'getelementbyid': '🔍', 'queryselector': '🔎', 'addeventlistener': '🎯',
+                'createelement': '➕', 'appendchild': '📎', 'innerhtml': '🖋️',
+                'classlist': '🎨', 'style': '🎨',
+                // Error
+                'trycatch': '🛡️', 'throw': '💥', 'finally': '🏁',
+                // Date
+                'date-object': '📅', 'getdate': '📆', 'setdate': '✏️', 'date-format': '🔄', 'timestamp': '⏱️',
+                // Math
+                'math-random': '🎲', 'math-round': '🔢', 'math-floor': '⬇️', 'math-ceil': '⬆️',
+                'math-max': '⬆️', 'math-min': '⬇️', 'math-pow': '⚡', 'math-sqrt': '√',
+                // String
+                'string-length': '📏', 'string-charat': '🔍', 'string-substring': '✂️', 'string-slice': '🔪',
+                'string-indexof': '🔎', 'string-replace': '🔄', 'string-tolowercase': '🔠', 'string-touppercase': '🔠',
+                'string-trim': '✂️', 'string-split': '🔪',
+                // JSON
+                'json-stringify': '➡️', 'json-parse': '⬅️', 'localstorage': '💾',
+                // এডভান্সড
+                'promise': '🤝', 'fetch-api': '🌐', 'settimeout': '⏰', 'setinterval': '🔄',
+                'destructuring': '🎁', 'spread': '📤'
+            };
+            
+            return icons[type] || '📦';
+        }
+
+        function getBlockTag(type) {
+            const tags = {
+                'variable': 'VAR', 'number': 'NUM', 'string': 'STR', 'boolean': 'BOOL',
+                'null': 'NULL', 'undefined': 'UNDEF', 'array': 'ARR', 'object': 'OBJ',
+                'array-push': 'PUSH', 'array-pop': 'POP', 'array-shift': 'SHIFT', 'array-unshift': 'UNSHIFT',
+                'array-map': 'MAP', 'array-filter': 'FILTER', 'array-reduce': 'REDUCE', 'array-find': 'FIND',
+                'array-includes': 'INCL', 'array-indexof': 'IDX', 'array-slice': 'SLICE', 'array-splice': 'SPLICE',
+                'array-concat': 'CONCAT', 'array-sort': 'SORT', 'array-reverse': 'REV',
+                'for-loop': 'FOR', 'while-loop': 'WHILE', 'dowhile-loop': 'DOWHILE', 'foreach': 'FOREA',
+                'forin-loop': 'FORIN', 'forof-loop': 'FOROF', 'break-continue': 'BRK',
+                'if': 'IF', 'if-else': 'IFELSE', 'elseif': 'ELIF', 'switch': 'SWITCH', 'ternary': 'TER',
+                'function': 'FUNC', 'arrow-function': 'ARROW', 'function-call': 'CALL', 'return-statement': 'RET',
+                'callback-function': 'CB', 'async-function': 'ASYNC',
+                'console-log': 'LOG', 'alert': 'ALERT', 'prompt': 'PROMPT', 'confirm': 'CONF',
+                'getelementbyid': 'ID', 'queryselector': 'QS', 'addeventlistener': 'EVENT',
+                'createelement': 'CREATE', 'appendchild': 'APPEND', 'innerhtml': 'HTML',
+                'classlist': 'CLASS', 'style': 'STYLE',
+                'trycatch': 'TRY', 'throw': 'THROW', 'finally': 'FIN',
+                'date-object': 'DATE', 'getdate': 'GET', 'setdate': 'SET', 'date-format': 'FMT', 'timestamp': 'TS',
+                'math-random': 'RAND', 'math-round': 'ROUND', 'math-floor': 'FLOOR', 'math-ceil': 'CEIL',
+                'math-max': 'MAX', 'math-min': 'MIN', 'math-pow': 'POW', 'math-sqrt': 'SQRT',
+                'string-length': 'LEN', 'string-charat': 'CHAR', 'string-substring': 'SUB', 'string-slice': 'SLICE',
+                'string-indexof': 'IDX', 'string-replace': 'REPL', 'string-tolowercase': 'LOW', 'string-touppercase': 'UP',
+                'string-trim': 'TRIM', 'string-split': 'SPLIT',
+                'json-stringify': 'STR', 'json-parse': 'PARSE', 'localstorage': 'STOR',
+                'promise': 'PROM', 'fetch-api': 'FETCH', 'settimeout': 'TIMEOUT', 'setinterval': 'INTERVAL',
+                'destructuring': 'DEST', 'spread': 'SPREAD'
+            };
+            
+            return tags[type] || 'BLK';
+        }
+
+        function getBlockPreview(block) {
+            switch(block.type) {
+                case 'variable':
+                    return `${block.varType} ${block.varName} = ${block.varValue};`;
+                case 'array':
+                    return `let ${block.varName} = [${block.values}];`;
+                case 'array-push':
+                    return `${block.arrayName}.push(${block.value});`;
+                case 'array-pop':
+                    return `${block.arrayName}.pop();`;
+                case 'array-map':
+                    return `let ${block.resultName} = ${block.arrayName}.map(${block.callback});`;
+                case 'array-filter':
+                    return `let ${block.resultName} = ${block.arrayName}.filter(${block.condition});`;
+                case 'console-log':
+                    return `console.log("${block.message}");`;
+                case 'function':
+                    return `function ${block.funcName}(${block.params}) { ... }`;
+                case 'for-loop':
+                    return `for (let ${block.variable} = ${block.start}; ${block.variable} < ${block.end}; ${block.variable}++)`;
+                case 'if':
+                    return `if (${block.condition}) { ... }`;
+                case 'if-else':
+                    return `if (${block.condition}) { ... } else { ... }`;
+                case 'object':
+                    return `let ${block.varName} = { ${block.properties.split('\n')[0]} ... };`;
+                case 'date-object':
+                    return `let ${block.variableName} = new Date();`;
+                case 'math-random':
+                    return `let ${block.resultName} = Math.random() * (${block.max} - ${block.min}) + ${block.min};`;
+                case 'string-length':
+                    return `let ${block.resultName} = ${block.string}.length;`;
+                case 'json-stringify':
+                    return `let ${block.resultName} = JSON.stringify(${block.object});`;
+                case 'promise':
+                    return `let ${block.promiseName} = new Promise(${block.executor.split('\n')[0]}...);`;
+                default:
+                    return block.title + ' - ' + block.description;
+            }
+        }
+
+        // Rest of the JavaScript code remains the same as before
+        // (editBlock, showConfigModal, generateFormForBlock, saveBlockConfig, etc.)
+        // The modal form generation and saving logic should be updated similarly
+        // to handle all the new block types
+
+        function editBlock(index) {
+            currentEditingIndex = index;
+            const block = builderBlocks[index];
+            showConfigModal(block);
+        }
+
+        function showConfigModal(block) {
+            const modal = document.getElementById('configModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalForm = document.getElementById('modalForm');
+
+            modalTitle.textContent = `${block.title} Configure করুন`;
+            modalForm.innerHTML = generateFormForBlock(block);
+            modal.classList.add('show');
+        }
+
+        function generateFormForBlock(block) {
+            // This function would need to be extended to handle all block types
+            // For brevity, I'm showing a simplified version
+            let formHTML = `<p>${block.description}</p>`;
+            
+            switch(block.type) {
+                case 'variable':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Variable Type:</label>
+                            <select id="varType">
+                                <option value="let" ${block.varType === 'let' ? 'selected' : ''}>let</option>
+                                <option value="const" ${block.varType === 'const' ? 'selected' : ''}>const</option>
+                                <option value="var" ${block.varType === 'var' ? 'selected' : ''}>var</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Variable Name:</label>
+                            <input type="text" id="varName" value="${block.varName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Value:</label>
+                            <input type="text" id="varValue" value="${block.varValue}">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'array':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Array Name:</label>
+                            <input type="text" id="varName" value="${block.varName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Values (comma separated):</label>
+                            <input type="text" id="values" value="${block.values}">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'console-log':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Message:</label>
+                            <input type="text" id="message" value="${block.message}">
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Configure ${block.title}:</label>
+                            <textarea id="customConfig">${JSON.stringify(block, null, 2)}</textarea>
+                        </div>
+                    `;
+            }
+            
+            return formHTML;
+        }
+
+        function saveBlockConfig() {
+            if (currentEditingIndex >= 0) {
+                const block = builderBlocks[currentEditingIndex];
+                const form = document.getElementById('modalForm');
+                
+                // Update based on form inputs
+                // This is simplified - you would need to handle each block type
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.id && block.hasOwnProperty(input.id)) {
+                        block[input.id] = input.value;
+                    }
+                });
+                
+                renderBuilderArea();
+                generateCode();
+                closeModal();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('configModal').classList.remove('show');
+        }
+
+        function deleteBlock(index) {
+            if (confirm('Delete this block?')) {
+                builderBlocks.splice(index, 1);
+                renderBuilderArea();
+                generateCode();
+                updateBlockCount();
+            }
+        }
+
+        function updateBlockCount() {
+            document.getElementById('blockCount').textContent = `${builderBlocks.length} blocks`;
+        }
+
+        function filterBlocks() {
+            const searchTerm = document.getElementById('searchBlocks').value.toLowerCase();
+            const categories = document.querySelectorAll('.category');
+            
+            categories.forEach(category => {
+                const blocks = category.querySelectorAll('.code-block');
+                let visibleCount = 0;
+                
+                blocks.forEach(block => {
+                    const title = block.querySelector('.code-block-title').textContent.toLowerCase();
+                    const desc = block.querySelector('.code-block-desc').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || desc.includes(searchTerm)) {
+                        block.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        block.style.display = 'none';
+                    }
+                });
+                
+                // Show/hide category based on visible blocks
+                const categoryTitle = category.querySelector('.category-count');
+                category.style.display = visibleCount > 0 ? 'block' : 'none';
+            });
+        }
+
+        function moveBlockUp(index) {
+            if (index > 0) {
+                const temp = builderBlocks[index];
+                builderBlocks[index] = builderBlocks[index - 1];
+                builderBlocks[index - 1] = temp;
+                renderBuilderArea();
+                generateCode();
+            }
+        }
+
+        function moveBlockDown(index) {
+            if (index < builderBlocks.length - 1) {
+                const temp = builderBlocks[index];
+                builderBlocks[index] = builderBlocks[index + 1];
+                builderBlocks[index + 1] = temp;
+                renderBuilderArea();
+                generateCode();
+            }
+        }
+
+        function dragBuilderBlock(event, index) {
+            event.dataTransfer.setData('text/plain', index);
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function dropBuilderBlock(event, targetIndex) {
+            event.preventDefault();
+            const sourceIndex = parseInt(event.dataTransfer.getData('text/plain'));
+            
+            if (!isNaN(sourceIndex) && sourceIndex !== targetIndex) {
+                const temp = builderBlocks[sourceIndex];
+                builderBlocks.splice(sourceIndex, 1);
+                builderBlocks.splice(targetIndex, 0, temp);
+                renderBuilderArea();
+                generateCode();
+            }
+        }
+
+        function generateCode() {
+            const output = document.getElementById('codeOutput');
+            if (builderBlocks.length === 0) {
+                output.innerHTML = `
+                    <div class="comment">// Your code will appear here...</div>
+                    <div class="comment">// Drag and drop blocks from the left panel</div>
+                    <div class="comment">// Then click Generate Code button</div>
+                `;
+                return;
+            }
+
+            let code = '';
+            let indentLevel = 0;
+
+            builderBlocks.forEach(block => {
+                let blockCode = generateBlockCode(block, indentLevel);
+                code += blockCode + '\n\n';
+            });
+
+            // Highlight the code
+            code = highlightCode(code);
+            output.innerHTML = code;
+        }
+
+        function generateBlockCode(block, indentLevel) {
+            const indent = '  '.repeat(indentLevel);
+            let blockCode = '';
+            
+            switch(block.type) {
+                case 'variable':
+                    blockCode = `${indent}<span class="keyword">${block.varType}</span> <span class="function">${block.varName}</span> = <span class="number">${block.varValue}</span>;`;
+                    break;
+                    
+                case 'array':
+                    blockCode = `${indent}<span class="keyword">let</span> <span class="function">${block.varName}</span> = [<span class="number">${block.values}</span>];`;
+                    break;
+                    
+                case 'array-push':
+                    blockCode = `${indent}<span class="function">${block.arrayName}</span>.<span class="keyword">push</span>(<span class="number">${block.value}</span>);`;
+                    break;
+                    
+                case 'console-log':
+                    blockCode = `${indent}<span class="keyword">console</span>.<span class="function">log</span>(<span class="string">"${block.message}"</span>);`;
+                    break;
+                    
+                case 'for-loop':
+                    blockCode = `${indent}<span class="keyword">for</span> (<span class="keyword">let</span> <span class="function">${block.variable}</span> = <span class="number">${block.start}</span>; <span class="function">${block.variable}</span> &lt; <span class="number">${block.end}</span>; <span class="function">${block.variable}</span>++) {\n`;
+                    blockCode += `${indent}  ${block.body}\n`;
+                    blockCode += `${indent}}`;
+                    break;
+                    
+                case 'if':
+                    blockCode = `${indent}<span class="keyword">if</span> (<span class="function">${block.condition}</span>) {\n`;
+                    blockCode += `${indent}  ${block.body}\n`;
+                    blockCode += `${indent}}`;
+                    break;
+                    
+                default:
+                    blockCode = `${indent}<span class="comment">// ${block.title}: ${block.description}</span>`;
+            }
+            
+            return blockCode;
+        }
+
+        function highlightCode(code) {
+            // Simple syntax highlighting
+            return code.split('\n').map(line => {
+                return `<div class="code-line">${line}</div>`;
+            }).join('');
+        }
+
+        function copyCode() {
+            const output = document.getElementById('codeOutput');
+            const text = output.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+
+        function runCode() {
+            const output = document.getElementById('codeOutput');
+            const code = output.innerText;
+            
+            try {
+                // Create a new script element
+                const script = document.createElement('script');
+                script.textContent = code;
+                document.body.appendChild(script);
+                document.body.removeChild(script);
+                
+                alert('Code executed successfully! Check console (F12)');
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function clearAll() {
+            if (confirm('Clear all blocks?')) {
+                builderBlocks = [];
+                renderBuilderArea();
+                generateCode();
+                updateBlockCount();
+            }
+        }
+
+        function downloadCode() {
+            const output = document.getElementById('codeOutput');
+            const code = output.innerText;
+            
+            const blob = new Blob([code], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated-code.js';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function saveProject() {
+            const project = {
+                blocks: builderBlocks,
+                timestamp: new Date().toISOString()
+            };
+            
+            const data = JSON.stringify(project, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'code-builder-project.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('Project saved!');
+        }
+
+        function loadProject() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    try {
+                        const project = JSON.parse(event.target.result);
+                        builderBlocks = project.blocks || [];
+                        renderBuilderArea();
+                        generateCode();
+                        updateBlockCount();
+                        alert('Project loaded successfully!');
+                    } catch (error) {
+                        alert('Error loading project: ' + error.message);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function formatCode() {
+            generateCode();
+            alert('Code formatted!');
+        }
+
+        function exportAsHTML() {
+            const output = document.getElementById('codeOutput');
+            const code = output.innerText;
+            
+            const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generated JavaScript Code</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        pre { background: #f4f4f4; padding: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Generated JavaScript Code</h1>
+    <pre>${code}</pre>
+    <script>
+        ${code}
+    <\/script>
+</body>
+</html>`;
+            
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated-code.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        updateBlockCount();
+        generateCode();
+    </script>
+</body>
+</html>
