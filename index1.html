@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Code Builder - সহজে কোড লিখুন</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 500px;
+            min-height: 700px;
+        }
+
+        /* Left Sidebar - Code Blocks */
+        .blocks-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-right: 2px solid #e9ecef;
+            overflow-y: auto;
+        }
+
+        .category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .code-block {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: move;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .code-block:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .code-block-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .code-block-desc {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        /* Middle - Builder Area */
+        .builder-area {
+            padding: 30px;
+            background: #ffffff;
+            overflow-y: auto;
+        }
+
+        .builder-title {
+            font-size: 1.5em;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone {
+            min-height: 400px;
+            border: 3px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f7fafc;
+        }
+
+        .drop-zone.drag-over {
+            background: #e6fffa;
+            border-color: #38b2ac;
+        }
+
+        .drop-zone-empty {
+            text-align: center;
+            color: #a0aec0;
+            padding: 60px 20px;
+            font-size: 18px;
+        }
+
+        .builder-block {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .builder-block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .builder-block-title {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .builder-block-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .block-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-delete {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #f56565;
+        }
+
+        .btn-edit {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #3182ce;
+        }
+
+        .block-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .block-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Right Sidebar - Generated Code */
+        .code-output {
+            background: #1a202c;
+            padding: 20px;
+            overflow-y: auto;
+            color: #68d391;
+            font-family: 'Courier New', monospace;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #2d3748;
+        }
+
+        .output-title {
+            color: #68d391;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #f56565;
+        }
+
+        .code-line {
+            margin: 5px 0;
+            line-height: 1.8;
+        }
+
+        .indent-1 { margin-left: 20px; }
+        .indent-2 { margin-left: 40px; }
+        .indent-3 { margin-left: 60px; }
+
+        .keyword { color: #fc8181; }
+        .function { color: #fbd38d; }
+        .string { color: #68d391; }
+        .number { color: #90cdf4; }
+        .comment { color: #a0aec0; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .blocks-panel, .code-output {
+                max-height: 400px;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            background-color: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 5px 10px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ JavaScript Code Builder</h1>
+            <p>Drag & Drop করে সহজে JavaScript Code তৈরি করুন</p>
+        </div>
+
+        <div class="main-layout">
+            <!-- Left Panel - Code Blocks -->
+            <div class="blocks-panel">
+                <div class="category">
+                    <div class="category-title">📦 Variables</div>
+                    <div class="code-block" draggable="true" data-type="variable">
+                        <div class="code-block-title">Variable Declare</div>
+                        <div class="code-block-desc">let, const, var</div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">🔢 Arrays</div>
+                    <div class="code-block" draggable="true" data-type="array">
+                        <div class="code-block-title">Create Array</div>
+                        <div class="code-block-desc">নতুন array তৈরি</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-push">
+                        <div class="code-block-title">Array Push</div>
+                        <div class="code-block-desc">Element যোগ করুন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-pop">
+                        <div class="code-block-title">Array Pop</div>
+                        <div class="code-block-desc">শেষ element মুছুন</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-map">
+                        <div class="code-block-title">Array Map</div>
+                        <div class="code-block-desc">Transform elements</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="array-filter">
+                        <div class="code-block-title">Array Filter</div>
+                        <div class="code-block-desc">Filter elements</div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">🔄 Loops</div>
+                    <div class="code-block" draggable="true" data-type="for-loop">
+                        <div class="code-block-title">For Loop</div>
+                        <div class="code-block-desc">Traditional loop</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="while-loop">
+                        <div class="code-block-title">While Loop</div>
+                        <div class="code-block-desc">Condition loop</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="foreach">
+                        <div class="code-block-title">forEach Loop</div>
+                        <div class="code-block-desc">Array iteration</div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">❓ Conditions</div>
+                    <div class="code-block" draggable="true" data-type="if">
+                        <div class="code-block-title">If Statement</div>
+                        <div class="code-block-desc">Conditional logic</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="if-else">
+                        <div class="code-block-title">If-Else</div>
+                        <div class="code-block-desc">Two conditions</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="switch">
+                        <div class="code-block-title">Switch Case</div>
+                        <div class="code-block-desc">Multiple conditions</div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">⚙️ Functions</div>
+                    <div class="code-block" draggable="true" data-type="function">
+                        <div class="code-block-title">Function</div>
+                        <div class="code-block-desc">Regular function</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="arrow-function">
+                        <div class="code-block-title">Arrow Function</div>
+                        <div class="code-block-desc">Modern syntax</div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">📝 Objects</div>
+                    <div class="code-block" draggable="true" data-type="object">
+                        <div class="code-block-title">Create Object</div>
+                        <div class="code-block-desc">Object literal</div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">🖨️ Output</div>
+                    <div class="code-block" draggable="true" data-type="console-log">
+                        <div class="code-block-title">Console Log</div>
+                        <div class="code-block-desc">Print to console</div>
+                    </div>
+                    <div class="code-block" draggable="true" data-type="alert">
+                        <div class="code-block-title">Alert</div>
+                        <div class="code-block-desc">Show alert box</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle - Builder Area -->
+            <div class="builder-area">
+                <div class="builder-title">🎨 Code Builder Area</div>
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-empty">
+                        ⬅️ বাম দিক থেকে Code Blocks টেনে এনে এখানে ছেড়ে দিন
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Generated Code -->
+            <div class="code-output">
+                <div class="output-header">
+                    <div class="output-title">📄 Generated Code</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="copyCode()">
+                            📋 Copy
+                        </button>
+                        <button class="btn btn-primary" onclick="runCode()">
+                            ▶️ Run
+                        </button>
+                    </div>
+                </div>
+                <div class="action-buttons" style="margin-bottom: 20px;">
+                    <button class="btn btn-danger" onclick="clearAll()">
+                        🗑️ Clear All
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadCode()">
+                        💾 Download
+                    </button>
+                </div>
+                <div id="codeOutput">
+                    <div class="comment">// Your code will appear here...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Block Configuration -->
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Configure Block</div>
+            <div id="modalForm"></div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="saveBlockConfig()">Save</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let builderBlocks = [];
+        let currentEditingIndex = -1;
+        let draggedElement = null;
+
+        // Drag and Drop functionality
+        document.querySelectorAll('.code-block').forEach(block => {
+            block.addEventListener('dragstart', function(e) {
+                draggedElement = this.dataset.type;
+            });
+        });
+
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', function(e) {
+            this.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            if (draggedElement) {
+                addBlock(draggedElement);
+                draggedElement = null;
+            }
+        });
+
+        function addBlock(type) {
+            const block = createBlockConfig(type);
+            builderBlocks.push(block);
+            renderBuilderArea();
+            generateCode();
+        }
+
+        function createBlockConfig(type) {
+            const configs = {
+                'variable': {
+                    type: 'variable',
+                    title: 'Variable',
+                    varType: 'let',
+                    varName: 'myVariable',
+                    varValue: '0'
+                },
+                'array': {
+                    type: 'array',
+                    title: 'Array',
+                    varName: 'myArray',
+                    values: '1, 2, 3, 4, 5'
+                },
+                'array-push': {
+                    type: 'array-push',
+                    title: 'Array Push',
+                    arrayName: 'myArray',
+                    value: '10'
+                },
+                'array-pop': {
+                    type: 'array-pop',
+                    title: 'Array Pop',
+                    arrayName: 'myArray'
+                },
+                'array-map': {
+                    type: 'array-map',
+                    title: 'Array Map',
+                    arrayName: 'myArray',
+                    resultName: 'mapped',
+                    callback: 'x => x * 2'
+                },
+                'array-filter': {
+                    type: 'array-filter',
+                    title: 'Array Filter',
+                    arrayName: 'myArray',
+                    resultName: 'filtered',
+                    condition: 'x => x > 5'
+                },
+                'for-loop': {
+                    type: 'for-loop',
+                    title: 'For Loop',
+                    variable: 'i',
+                    start: '0',
+                    end: '10',
+                    step: '1',
+                    body: 'console.log(i);'
+                },
+                'while-loop': {
+                    type: 'while-loop',
+                    title: 'While Loop',
+                    condition: 'i < 10',
+                    body: 'console.log(i);\ni++;'
+                },
+                'foreach': {
+                    type: 'foreach',
+                    title: 'forEach',
+                    arrayName: 'myArray',
+                    itemName: 'item',
+                    body: 'console.log(item);'
+                },
+                'if': {
+                    type: 'if',
+                    title: 'If Statement',
+                    condition: 'x > 5',
+                    body: 'console.log("Greater than 5");'
+                },
+                'if-else': {
+                    type: 'if-else',
+                    title: 'If-Else',
+                    condition: 'x > 5',
+                    ifBody: 'console.log("Greater");',
+                    elseBody: 'console.log("Smaller");'
+                },
+                'switch': {
+                    type: 'switch',
+                    title: 'Switch',
+                    variable: 'day',
+                    cases: 'case 1:\n  console.log("Monday");\n  break;\ncase 2:\n  console.log("Tuesday");\n  break;\ndefault:\n  console.log("Other");'
+                },
+                'function': {
+                    type: 'function',
+                    title: 'Function',
+                    funcName: 'myFunction',
+                    params: 'a, b',
+                    body: 'return a + b;'
+                },
+                'arrow-function': {
+                    type: 'arrow-function',
+                    title: 'Arrow Function',
+                    funcName: 'myFunc',
+                    params: 'x',
+                    body: 'return x * 2;'
+                },
+                'object': {
+                    type: 'object',
+                    title: 'Object',
+                    varName: 'person',
+                    properties: 'name: "John",\nage: 30,\ncity: "Dhaka"'
+                },
+                'console-log': {
+                    type: 'console-log',
+                    title: 'Console Log',
+                    message: 'Hello World!'
+                },
+                'alert': {
+                    type: 'alert',
+                    title: 'Alert',
+                    message: 'Hello!'
+                }
+            };
+
+            return configs[type] || configs['console-log'];
+        }
+
+        function renderBuilderArea() {
+            const dropZone = document.getElementById('dropZone');
+            
+            if (builderBlocks.length === 0) {
+                dropZone.innerHTML = '<div class="drop-zone-empty">⬅️ বাম দিক থেকে Code Blocks টেনে এনে এখানে ছেড়ে দিন</div>';
+                return;
+            }
+
+            dropZone.innerHTML = builderBlocks.map((block, index) => `
+                <div class="builder-block">
+                    <div class="builder-block-header">
+                        <div class="builder-block-title">${block.title}</div>
+                        <div class="builder-block-actions">
+                            <button class="block-btn btn-edit" onclick="editBlock(${index})">Edit</button>
+                            <button class="block-btn btn-delete" onclick="deleteBlock(${index})">Delete</button>
+                        </div>
+                    </div>
+                    <div style="font-family: 'Courier New', monospace; font-size: 12px; color: #4a5568;">
+                        ${getBlockPreview(block)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getBlockPreview(block) {
+            switch(block.type) {
+                case 'variable':
+                    return `${block.varType} ${block.varName} = ${block.varValue};`;
+                case 'array':
+                    return `let ${block.varName} = [${block.values}];`;
+                case 'array-push':
+                    return `${block.arrayName}.push(${block.value});`;
+                case 'array-pop':
+                    return `${block.arrayName}.pop();`;
+                case 'console-log':
+                    return `console.log("${block.message}");`;
+                case 'function':
+                    return `function ${block.funcName}(${block.params}) { ... }`;
+                default:
+                    return block.title;
+            }
+        }
+
+        function editBlock(index) {
+            currentEditingIndex = index;
+            const block = builderBlocks[index];
+            showConfigModal(block);
+        }
+
+        function showConfigModal(block) {
+            const modal = document.getElementById('configModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalForm = document.getElementById('modalForm');
+
+            modalTitle.textContent = `Configure ${block.title}`;
+            modalForm.innerHTML = generateFormForBlock(block);
+            modal.classList.add('show');
+        }
+
+        function generateFormForBlock(block) {
+            let formHTML = '';
+
+            switch(block.type) {
+                case 'variable':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Variable Type:</label>
+                            <select id="varType">
+                                <option value="let" ${block.varType === 'let' ? 'selected' : ''}>let</option>
+                                <option value="const" ${block.varType === 'const' ? 'selected' : ''}>const</option>
+                                <option value="var" ${block.varType === 'var' ? 'selected' : ''}>var</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Variable Name:</label>
+                            <input type="text" id="varName" value="${block.varName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Value:</label>
+                            <input type="text" id="varValue" value="${block.varValue}">
+                        </div>
+                    `;
+                    break;
+
+                case 'array':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Array Name:</label>
+                            <input type="text" id="varName" value="${block.varName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Values (comma separated):</label>
+                            <input type="text" id="values" value="${block.values}">
+                        </div>
+                    `;
+                    break;
+
+                case 'array-push':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Array Name:</label>
+                            <input type="text" id="arrayName" value="${block.arrayName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Value to Push:</label>
+                            <input type="text" id="value" value="${block.value}">
+                        </div>
+                    `;
+                    break;
+
+                case 'array-pop':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Array Name:</label>
+                            <input type="text" id="arrayName" value="${block.arrayName}">
+                        </div>
+                    `;
+                    break;
+
+                case 'array-map':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Array Name:</label>
+                            <input type="text" id="arrayName" value="${block.arrayName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Result Variable:</label>
+                            <input type="text" id="resultName" value="${block.resultName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Callback Function:</label>
+                            <input type="text" id="callback" value="${block.callback}">
+                        </div>
+                    `;
+                    break;
+
+                case 'array-filter':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Array Name:</label>
+                            <input type="text" id="arrayName" value="${block.arrayName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Result Variable:</label>
+                            <input type="text" id="resultName" value="${block.resultName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Filter Condition:</label>
+                            <input type="text" id="condition" value="${block.condition}">
+                        </div>
+                    `;
+                    break;
+
+                case 'for-loop':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Loop Variable:</label>
+                            <input type="text" id="variable" value="${block.variable}">
+                        </div>
+                        <div class="form-group">
+                            <label>Start Value:</label>
+                            <input type="text" id="start" value="${block.start}">
+                        </div>
+                        <div class="form-group">
+                            <label>End Value:</label>
+                            <input type="text" id="end" value="${block.end}">
+                        </div>
+                        <div class="form-group">
+                            <label>Step:</label>
+                            <input type="text" id="step" value="${block.step}">
+                        </div>
+                        <div class="form-group">
+                            <label>Loop Body:</label>
+                            <textarea id="body">${block.body}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'while-loop':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Condition:</label>
+                            <input type="text" id="condition" value="${block.condition}">
+                        </div>
+                        <div class="form-group">
+                            <label>Loop Body:</label>
+                            <textarea id="body">${block.body}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'foreach':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Array Name:</label>
+                            <input type="text" id="arrayName" value="${block.arrayName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Item Variable:</label>
+                            <input type="text" id="itemName" value="${block.itemName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Loop Body:</label>
+                            <textarea id="body">${block.body}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'if':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Condition:</label>
+                            <input type="text" id="condition" value="${block.condition}">
+                        </div>
+                        <div class="form-group">
+                            <label>If Body:</label>
+                            <textarea id="body">${block.body}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'if-else':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Condition:</label>
+                            <input type="text" id="condition" value="${block.condition}">
+                        </div>
+                        <div class="form-group">
+                            <label>If Body:</label>
+                            <textarea id="ifBody">${block.ifBody}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Else Body:</label>
+                            <textarea id="elseBody">${block.elseBody}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'switch':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Variable:</label>
+                            <input type="text" id="variable" value="${block.variable}">
+                        </div>
+                        <div class="form-group">
+                            <label>Cases:</label>
+                            <textarea id="cases">${block.cases}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'function':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Function Name:</label>
+                            <input type="text" id="funcName" value="${block.funcName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Parameters:</label>
+                            <input type="text" id="params" value="${block.params}">
+                        </div>
+                        <div class="form-group">
+                            <label>Function Body:</label>
+                            <textarea id="body">${block.body}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'arrow-function':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Function Name:</label>
+                            <input type="text" id="funcName" value="${block.funcName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Parameters:</label>
+                            <input type="text" id="params" value="${block.params}">
+                        </div>
+                        <div class="form-group">
+                            <label>Function Body:</label>
+                            <textarea id="body">${block.body}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'object':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Object Name:</label>
+                            <input type="text" id="varName" value="${block.varName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Properties:</label>
+                            <textarea id="properties">${block.properties}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'console-log':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Message:</label>
+                            <input type="text" id="message" value="${block.message}">
+                        </div>
+                    `;
+                    break;
+
+                case 'alert':
+                    formHTML = `
+                        <div class="form-group">
+                            <label>Message:</label>
+                            <input type="text" id="message" value="${block.message}">
+                        </div>
+                    `;
+                    break;
+            }
+
+            return formHTML;
+        }
+
+        function saveBlockConfig() {
+            const block = builderBlocks[currentEditingIndex];
+
+            // Update block based on type
+            const formElements = document.getElementById('modalForm').querySelectorAll('input, select, textarea');
+            formElements.forEach(element => {
+                if (element.id && block.hasOwnProperty(element.id)) {
+                    block[element.id] = element.value;
+                }
+            });
+
+            renderBuilderArea();
+            generateCode();
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('configModal').classList.remove('show');
+        }
+
+        function deleteBlock(index) {
+            builderBlocks.splice(index, 1);
+            renderBuilderArea();
+            generateCode();
+        }
+
+        function generateCode() {
+            const output = document.getElementById('codeOutput');
+            if (builderBlocks.length === 0) {
+                output.innerHTML = '<div class="comment">// Your code will appear here...</div>';
+                return;
+            }
+
+            let code = '';
+
+            builderBlocks.forEach(block => {
+                switch(block.type) {
+                    case 'variable':
+                        code += `<span class="keyword">${block.varType}</span> ${block.varName} = ${block.varValue};\n`;
+                        break;
+
+                    case 'array':
+                        code += `<span class="keyword">let</span> ${block.varName} = [${block.values}];\n`;
+                        break;
+
+                    case 'array-push':
+                        code += `${block.arrayName}.<span class="function">push</span>(${block.value});\n`;
+                        break;
+
+                    case 'array-pop':
+                        code += `${block.arrayName}.<span class="function">pop</span>();\n`;
+                        break;
+
+                    case 'array-map':
+                        code += `<span class="keyword">let</span> ${block.resultName} = ${block.arrayName}.<span class="function">map</span>(${block.callback});\n`;
+                        break;
+
+                    case 'array-filter':
+                        code += `<span class="keyword">let</span> ${block.resultName} = ${block.arrayName}.<span class="function">filter</span>(${block.condition});\n`;
+                        break;
+
+                    case 'for-loop':
+                        code += `<span class="keyword">for</span> (<span class="keyword">let</span> ${block.variable} = ${block.start}; ${block.variable} < ${block.end}; ${block.variable} += ${block.step}) {\n`;
+                        code += `  ${block.body.replace(/\n/g, '\n  ')}\n`;
+                        code += `}\n`;
+                        break;
+
+                    case 'while-loop':
+                        code += `<span class="keyword">while</span> (${block.condition}) {\n`;
+                        code += `  ${block.body.replace(/\n/g, '\n  ')}\n`;
+                        code += `}\n`;
+                        break;
+
+                    case 'foreach':
+                        code += `${block.arrayName}.<span class="function">forEach</span>(${block.itemName} => {\n`;
+                        code += `  ${block.body.replace(/\n/g, '\n  ')}\n`;
+                        code += `});\n`;
+                        break;
+
+                    case 'if':
+                        code += `<span class="keyword">if</span> (${block.condition}) {\n`;
+                        code += `  ${block.body.replace(/\n/g, '\n  ')}\n`;
+                        code += `}\n`;
+                        break;
+
+                    case 'if-else':
+                        code += `<span class="keyword">if</span> (${block.condition}) {\n`;
+                        code += `  ${block.ifBody.replace(/\n/g, '\n  ')}\n`;
+                        code += `} <span class="keyword">else</span> {\n`;
+                        code += `  ${block.elseBody.replace(/\n/g, '\n  ')}\n`;
+                        code += `}\n`;
+                        break;
+
+                    case 'switch':
+                        code += `<span class="keyword">switch</span> (${block.variable}) {\n`;
+                        code += `  ${block.cases.replace(/\n/g, '\n  ')}\n`;
+                        code += `}\n`;
+                        break;
+
+                    case 'function':
+                        code += `<span class="keyword">function</span> <span class="function">${block.funcName}</span>(${block.params}) {\n`;
+                        code += `  ${block.body.replace(/\n/g, '\n  ')}\n`;
+                        code += `}\n`;
+                        break;
+
+                    case 'arrow-function':
+                        code += `<span class="keyword">const</span> <span class="function">${block.funcName}</span> = (${block.params}) => {\n`;
+                        code += `  ${block.body.replace(/\n/g, '\n  ')}\n`;
+                        code += `};\n`;
+                        break;
+
+                    case 'object':
+                        code += `<span class="keyword">let</span> ${block.varName} = {\n`;
+                        code += `  ${block.properties.replace(/\n/g, '\n  ')}\n`;
+                        code += `};\n`;
+                        break;
+
+                    case 'console-log':
+                        code += `<span class="keyword">console</span>.<span class="function">log</span>(<span class="string">"${block.message}"</span>);\n`;
+                        break;
+
+                    case 'alert':
+                        code += `<span class="function">alert</span>(<span class="string">"${block.message}"</span>);\n`;
+                        break;
+                }
+
+                code += '\n';
+            });
+
+            output.innerHTML = code.split('\n').map(line => `<div class="code-line">${line}</div>`).join('');
+        }
+
+        function copyCode() {
+            const output = document.getElementById('codeOutput');
+            const text = output.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Code copied to clipboard!');
+            });
+        }
+
+        function runCode() {
+            const output = document.getElementById('codeOutput');
+            const code = output.innerText;
+            
+            try {
+                // Create a new function and execute it
+                const func = new Function(code);
+                func();
+                alert('✅ Code executed successfully! Check console for output.');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all blocks?')) {
+                builderBlocks = [];
+                renderBuilderArea();
+                generateCode();
+            }
+        }
+
+        function downloadCode() {
+            const output = document.getElementById('codeOutput');
+            const code = output.innerText;
+            
+            const blob = new Blob([code], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated-code.js';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Code downloaded as generated-code.js');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('configModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
