@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Code Builder Pro v2.0 - সহজে কোড তৈরি করুন</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-main);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 1.6em;
+            margin-bottom: 3px;
+        }
+
+        .header-left p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .language-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr 450px;
+            overflow: hidden;
+            height: calc(100vh - 80px);
+        }
+
+        /* Left Panel - Blocks */
+        .blocks-panel {
+            background: var(--bg-card);
+            border-right: 2px solid var(--border);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            padding-bottom: 10px;
+            z-index: 10;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 35px 10px 10px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 13px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .code-block {
+            background: var(--bg-input);
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: move;
+            border-left: 3px solid var(--primary);
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .code-block:hover {
+            transform: translateX(5px);
+            background: var(--border);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .code-block.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .code-block-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .code-block-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Middle Panel - Builder */
+        .builder-panel {
+            background: var(--bg-main);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .builder-toolbar {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .builder-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .block-count {
+            background: var(--primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        .drop-zone {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px dashed var(--primary);
+        }
+
+        .drop-zone-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            border: 3px dashed var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+        }
+
+        .drop-zone-empty .icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .builder-block {
+            background: var(--bg-card);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.2s;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .builder-block:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transform: translateX(5px);
+        }
+
+        .builder-block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .builder-block-title {
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .block-number {
+            background: var(--bg-input);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        .builder-block-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .block-btn {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .btn-move {
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        .preview-code {
+            background: var(--bg-main);
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--success);
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        /* Right Panel - Code Output */
+        .code-panel {
+            background: var(--bg-card);
+            border-left: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-header {
+            background: var(--bg-input);
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            background: var(--bg-main);
+        }
+
+        .code-line {
+            margin: 2px 0;
+            padding-left: 5px;
+        }
+
+        .line-number {
+            display: inline-block;
+            width: 35px;
+            color: var(--text-secondary);
+            user-select: none;
+            text-align: right;
+            margin-right: 15px;
+        }
+
+        .keyword { color: #ec4899; font-weight: 600; }
+        .function { color: #f59e0b; }
+        .string { color: #10b981; }
+        .number { color: #8b5cf6; }
+        .comment { color: #94a3b8; font-style: italic; }
+        .operator { color: #38bdf8; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-hint {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .modal-actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 2px solid var(--border);
+            padding-top: 20px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 280px 1fr 400px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+            }
+            
+            .blocks-panel {
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+            
+            .code-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>⚡ JavaScript Code Builder Pro v2.0</h1>
+                <p id="headerSubtitle">কোনো কোডিং জ্ঞান ছাড়াই সহজে JavaScript Code তৈরি করুন</p>
+            </div>
+            <div class="header-right">
+                <button class="language-toggle" onclick="toggleLanguage()">
+                    <span id="langText">🌐 English</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Panel -->
+            <div class="blocks-panel">
+                <div class="search-box">
+                    <input type="text" id="searchBlocks" placeholder="🔍 Search blocks..." oninput="filterBlocks()">
+                </div>
+
+                <div id="categoriesContainer">
+                    <!-- Variables -->
+                    <div class="category" data-category="variables">
+                        <div class="category-title">📦 Variables & Data</div>
+                        <div class="code-block" draggable="true" data-type="variable">
+                            <div class="code-block-title">🔤 Variable</div>
+                            <div class="code-block-desc">Create let/const/var</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="array">
+                            <div class="code-block-title">📋 Array</div>
+                            <div class="code-block-desc">Create array</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="object">
+                            <div class="code-block-title">🗃️ Object</div>
+                            <div class="code-block-desc">Create object</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="string">
+                            <div class="code-block-title">📝 String</div>
+                            <div class="code-block-desc">Create string variable</div>
+                        </div>
+                    </div>
+
+                    <!-- Loops -->
+                    <div class="category" data-category="loops">
+                        <div class="category-title">🔄 Loops</div>
+                        <div class="code-block" draggable="true" data-type="for-loop">
+                            <div class="code-block-title">🔂 For Loop</div>
+                            <div class="code-block-desc">Repeat N times</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="while-loop">
+                            <div class="code-block-title">🔄 While Loop</div>
+                            <div class="code-block-desc">Loop while true</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="foreach">
+                            <div class="code-block-title">📋 forEach</div>
+                            <div class="code-block-desc">Loop array items</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="for-of">
+                            <div class="code-block-title">🔃 For...of</div>
+                            <div class="code-block-desc">Loop values</div>
+                        </div>
+                    </div>
+
+                    <!-- Conditions -->
+                    <div class="category" data-category="conditions">
+                        <div class="category-title">❓ Conditions</div>
+                        <div class="code-block" draggable="true" data-type="if">
+                            <div class="code-block-title">✅ If Statement</div>
+                            <div class="code-block-desc">Check condition</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="if-else">
+                            <div class="code-block-title">↕️ If-Else</div>
+                            <div class="code-block-desc">Two options</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="if-elseif-else">
+                            <div class="code-block-title">🔀 If-ElseIf-Else</div>
+                            <div class="code-block-desc">Multiple conditions</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="switch">
+                            <div class="code-block-title">🔀 Switch</div>
+                            <div class="code-block-desc">Multiple cases</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="ternary">
+                            <div class="code-block-title">❔ Ternary</div>
+                            <div class="code-block-desc">Short if-else</div>
+                        </div>
+                    </div>
+
+                    <!-- Functions -->
+                    <div class="category" data-category="functions">
+                        <div class="category-title">⚙️ Functions</div>
+                        <div class="code-block" draggable="true" data-type="function">
+                            <div class="code-block-title">📦 Function</div>
+                            <div class="code-block-desc">Create function</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="arrow-function">
+                            <div class="code-block-title">➡️ Arrow Function</div>
+                            <div class="code-block-desc">ES6 arrow function</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="function-call">
+                            <div class="code-block-title">📞 Function Call</div>
+                            <div class="code-block-desc">Call a function</div>
+                        </div>
+                    </div>
+
+                    <!-- Array Methods -->
+                    <div class="category" data-category="array-methods">
+                        <div class="category-title">🔢 Array Methods</div>
+                        <div class="code-block" draggable="true" data-type="array-push">
+                            <div class="code-block-title">➕ Push</div>
+                            <div class="code-block-desc">Add to end</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="array-pop">
+                            <div class="code-block-title">➖ Pop</div>
+                            <div class="code-block-desc">Remove from end</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="array-map">
+                            <div class="code-block-title">🗺️ Map</div>
+                            <div class="code-block-desc">Transform array</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="array-filter">
+                            <div class="code-block-title">🔍 Filter</div>
+                            <div class="code-block-desc">Filter array</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="array-reduce">
+                            <div class="code-block-title">📊 Reduce</div>
+                            <div class="code-block-desc">Reduce to value</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="array-find">
+                            <div class="code-block-title">🔎 Find</div>
+                            <div class="code-block-desc">Find element</div>
+                        </div>
+                    </div>
+
+                    <!-- String Methods -->
+                    <div class="category" data-category="string-methods">
+                        <div class="category-title">🔤 String Methods</div>
+                        <div class="code-block" draggable="true" data-type="string-concat">
+                            <div class="code-block-title">➕ Concat</div>
+                            <div class="code-block-desc">Join strings</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="string-split">
+                            <div class="code-block-title">✂️ Split</div>
+                            <div class="code-block-desc">Split to array</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="string-substring">
+                            <div class="code-block-title">📏 Substring</div>
+                            <div class="code-block-desc">Extract part</div>
+                        </div>
+                    </div>
+
+                    <!-- Output -->
+                    <div class="category" data-category="output">
+                        <div class="category-title">🖨️ Output</div>
+                        <div class="code-block" draggable="true" data-type="console-log">
+                            <div class="code-block-title">💻 Console Log</div>
+                            <div class="code-block-desc">Print to console</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="alert">
+                            <div class="code-block-title">⚠️ Alert</div>
+                            <div class="code-block-desc">Show popup</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="prompt">
+                            <div class="code-block-title">❓ Prompt</div>
+                            <div class="code-block-desc">Get user input</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="confirm">
+                            <div class="code-block-title">✔️ Confirm</div>
+                            <div class="code-block-desc">Yes/No dialog</div>
+                        </div>
+                    </div>
+
+                    <!-- DOM -->
+                    <div class="category" data-category="dom">
+                        <div class="category-title">🌐 DOM</div>
+                        <div class="code-block" draggable="true" data-type="getelementbyid">
+                            <div class="code-block-title">🔍 Get Element by ID</div>
+                            <div class="code-block-desc">Get by ID</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="queryselector">
+                            <div class="code-block-title">🎯 Query Selector</div>
+                            <div class="code-block-desc">Select element</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="addeventlistener">
+                            <div class="code-block-title">🎯 Event Listener</div>
+                            <div class="code-block-desc">Add event</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="innerhtml">
+                            <div class="code-block-title">📝 innerHTML</div>
+                            <div class="code-block-desc">Set HTML content</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="style">
+                            <div class="code-block-title">🎨 Style</div>
+                            <div class="code-block-desc">Change CSS</div>
+                        </div>
+                    </div>
+
+                    <!-- Async -->
+                    <div class="category" data-category="async">
+                        <div class="category-title">⏱️ Async</div>
+                        <div class="code-block" draggable="true" data-type="settimeout">
+                            <div class="code-block-title">⏲️ setTimeout</div>
+                            <div class="code-block-desc">Delay execution</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="setinterval">
+                            <div class="code-block-title">🔄 setInterval</div>
+                            <div class="code-block-desc">Repeat execution</div>
+                        </div>
+                    </div>
+
+                    <!-- Math -->
+                    <div class="category" data-category="math">
+                        <div class="category-title">🔢 Math</div>
+                        <div class="code-block" draggable="true" data-type="math-random">
+                            <div class="code-block-title">🎲 Random</div>
+                            <div class="code-block-desc">Random number</div>
+                        </div>
+                        <div class="code-block" draggable="true" data-type="math-round">
+                            <div class="code-block-title">⚪ Round</div>
+                            <div class="code-block-desc">Round number</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Panel -->
+            <div class="builder-panel">
+                <div class="builder-toolbar">
+                    <div class="builder-title">
+                        🎨 <span id="builderText">Code Builder</span>
+                        <span class="block-count" id="blockCount">0 blocks</span>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button class="btn btn-primary" onclick="generateCode()" title="Generate Code">
+                            🔄 <span id="generateText">Generate</span>
+                        </button>
+                        <button class="btn btn-success" onclick="saveProject()" title="Save Project">
+                            💾 <span id="saveText">Save</span>
+                        </button>
+                        <button class="btn btn-warning" onclick="loadProject()" title="Load Project">
+                            📁 <span id="loadText">Load</span>
+                        </button>
+                        <button class="btn btn-danger" onclick="clearAll()" title="Clear All">
+                            🗑️ <span id="clearText">Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-empty">
+                        <div class="icon">📋</div>
+                        <div id="dropZoneText">
+                            ⬅️ বাম দিক থেকে Code Blocks টেনে এনে এখানে ছেড়ে দিন<br>
+                            <small style="opacity: 0.7; margin-top: 10px; display: block;">
+                                উদাহরণ: Variable তৈরি করুন, তারপর Console Log করুন
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="code-panel">
+                <div class="code-header">
+                    <div class="code-title">📄 <span id="codeTitle">Generated Code</span></div>
+                    <div class="code-actions">
+                        <button class="btn btn-success btn-sm" onclick="copyCode()" title="Copy Code">
+                            📋 <span id="copyText">Copy</span>
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="downloadCode()" title="Download Code">
+                            💾 <span id="downloadText">Download</span>
+                        </button>
+                        <button class="btn btn-warning btn-sm" onclick="runCode()" title="Run Code">
+                            ▶️ <span id="runText">Run</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="code-content" id="codeOutput">
+                    <div class="code-line">
+                        <span class="line-number">1</span>
+                        <span class="comment">// Your code will appear here...</span>
+                    </div>
+                    <div class="code-line">
+                        <span class="line-number">2</span>
+                        <span class="comment">// Drag blocks from the left panel</span>
+                    </div>
+                    <div class="code-line">
+                        <span class="line-number">3</span>
+                        <span class="comment">// Click Generate to create code</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">
+                ⚙️ Configure Block
+            </div>
+            <div id="modalForm"></div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="saveBlockConfig()">
+                    ✓ <span id="modalSave">Save</span>
+                </button>
+                <button class="btn btn-danger" onclick="closeModal()">
+                    ✕ <span id="modalCancel">Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let builderBlocks = [];
+        let currentEditingIndex = -1;
+        let draggedType = null;
+        let currentLanguage = 'bn'; // 'bn' for Bengali, 'en' for English
+
+        // Language translations
+        const translations = {
+            bn: {
+                headerSubtitle: 'কোনো কোডিং জ্ঞান ছাড়াই সহজে JavaScript Code তৈরি করুন',
+                builderText: 'Code Builder',
+                generateText: 'Generate',
+                saveText: 'Save',
+                loadText: 'Load',
+                clearText: 'Clear',
+                codeTitle: 'Generated Code',
+                copyText: 'Copy',
+                downloadText: 'Download',
+                runText: 'Run',
+                modalSave: 'Save',
+                modalCancel: 'Cancel',
+                dropZoneText: '⬅️ বাম দিক থেকে Code Blocks টেনে এনে এখানে ছেড়ে দিন<br><small style="opacity: 0.7; margin-top: 10px; display: block;">উদাহরণ: Variable তৈরি করুন, তারপর Console Log করুন</small>',
+                langText: '🌐 English'
+            },
+            en: {
+                headerSubtitle: 'Create JavaScript Code easily without any coding knowledge',
+                builderText: 'Code Builder',
+                generateText: 'Generate',
+                saveText: 'Save',
+                loadText: 'Load',
+                clearText: 'Clear',
+                codeTitle: 'Generated Code',
+                copyText: 'Copy',
+                downloadText: 'Download',
+                runText: 'Run',
+                modalSave: 'Save',
+                modalCancel: 'Cancel',
+                dropZoneText: '⬅️ Drag and drop Code Blocks from the left panel here<br><small style="opacity: 0.7; margin-top: 10px; display: block;">Example: Create a Variable, then Console Log it</small>',
+                langText: '🌐 বাংলা'
+            }
+        };
+
+        // Initialize drag and drop
+        function initDragAndDrop() {
+            document.querySelectorAll('.code-block').forEach(block => {
+                block.addEventListener('dragstart', function(e) {
+                    draggedType = this.dataset.type;
+                    this.classList.add('dragging');
+                });
+
+                block.addEventListener('dragend', function(e) {
+                    this.classList.remove('dragging');
+                });
+            });
+
+            const dropZone = document.getElementById('dropZone');
+
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            dropZone.addEventListener('dragleave', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('drag-over');
+                }
+            });
+
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                if (draggedType) {
+                    addBlock(draggedType);
+                    draggedType = null;
+                }
+            });
+        }
+
+        // Add block to builder
+        function addBlock(type) {
+            const block = createBlockConfig(type);
+            builderBlocks.push(block);
+            renderBuilderArea();
+            updateBlockCount();
+            generateCode();
+            showNotification('✅ Block added successfully!', 'success');
+        }
+
+        // Create block configuration
+        function createBlockConfig(type) {
+            const configs = {
+                'variable': {
+                    type: 'variable',
+                    title: 'Variable',
+                    varType: 'let',
+                    varName: 'myVar',
+                    varValue: '0'
+                },
+                'array': {
+                    type: 'array',
+                    title: 'Array',
+                    varName: 'myArray',
+                    values: '1, 2, 3, 4, 5'
+                },
+                'object': {
+                    type: 'object',
+                    title: 'Object',
+                    varName: 'myObject',
+                    properties: 'name: "John", age: 30'
+                },
+                'string': {
+                    type: 'string',
+                    title: 'String',
+                    varName: 'myString',
+                    value: 'Hello World'
+                },
+                'for-loop': {
+                    type: 'for-loop',
+                    title: 'For Loop',
+                    variable: 'i',
+                    start: '0',
+                    end: '10',
+                    increment: '1',
+                    body: 'console.log(i);'
+                },
+                'while-loop': {
+                    type: 'while-loop',
+                    title: 'While Loop',
+                    condition: 'i < 10',
+                    body: 'console.log(i);\n  i++;'
+                },
+                'foreach': {
+                    type: 'foreach',
+                    title: 'forEach',
+                    arrayName: 'myArray',
+                    itemName: 'item',
+                    body: 'console.log(item);'
+                },
+                'for-of': {
+                    type: 'for-of',
+                    title: 'For...of',
+                    variable: 'item',
+                    arrayName: 'myArray',
+                    body: 'console.log(item);'
+                },
+                'if': {
+                    type: 'if',
+                    title: 'If Statement',
+                    condition: 'x > 5',
+                    body: 'console.log("Greater than 5");'
+                },
+                'if-else': {
+                    type: 'if-else',
+                    title: 'If-Else',
+                    condition: 'x > 5',
+                    ifBody: 'console.log("Greater");',
+                    elseBody: 'console.log("Smaller");'
+                },
+                'if-elseif-else': {
+                    type: 'if-elseif-else',
+                    title: 'If-ElseIf-Else',
+                    condition1: 'x > 10',
+                    body1: 'console.log("Greater than 10");',
+                    condition2: 'x > 5',
+                    body2: 'console.log("Greater than 5");',
+                    elseBody: 'console.log("5 or less");'
+                },
+                'switch': {
+                    type: 'switch',
+                    title: 'Switch',
+                    variable: 'day',
+                    cases: 'case 1:\n      console.log("Monday");\n      break;\n    case 2:\n      console.log("Tuesday");\n      break;'
+                },
+                'ternary': {
+                    type: 'ternary',
+                    title: 'Ternary',
+                    varName: 'result',
+                    condition: 'x > 5',
+                    trueValue: '"Greater"',
+                    falseValue: '"Smaller"'
+                },
+                'function': {
+                    type: 'function',
+                    title: 'Function',
+                    funcName: 'myFunction',
+                    params: 'a, b',
+                    body: 'return a + b;'
+                },
+                'arrow-function': {
+                    type: 'arrow-function',
+                    title: 'Arrow Function',
+                    funcName: 'myFunc',
+                    params: 'x',
+                    body: 'return x * 2;'
+                },
+                'function-call': {
+                    type: 'function-call',
+                    title: 'Function Call',
+                    funcName: 'myFunction',
+                    args: '5, 10'
+                },
+                'array-push': {
+                    type: 'array-push',
+                    title: 'Array Push',
+                    arrayName: 'myArray',
+                    value: '10'
+                },
+                'array-pop': {
+                    type: 'array-pop',
+                    title: 'Array Pop',
+                    arrayName: 'myArray',
+                    varName: 'lastItem'
+                },
+                'array-map': {
+                    type: 'array-map',
+                    title: 'Array Map',
+                    arrayName: 'myArray',
+                    resultName: 'mapped',
+                    callback: 'item => item * 2'
+                },
+                'array-filter': {
+                    type: 'array-filter',
+                    title: 'Array Filter',
+                    arrayName: 'myArray',
+                    resultName: 'filtered',
+                    condition: 'item => item > 5'
+                },
+                'array-reduce': {
+                    type: 'array-reduce',
+                    title: 'Array Reduce',
+                    arrayName: 'myArray',
+                    resultName: 'sum',
+                    callback: '(acc, item) => acc + item',
+                    initial: '0'
+                },
+                'array-find': {
+                    type: 'array-find',
+                    title: 'Array Find',
+                    arrayName: 'myArray',
+                    resultName: 'found',
+                    condition: 'item => item > 5'
+                },
+                'string-concat': {
+                    type: 'string-concat',
+                    title: 'String Concat',
+                    varName: 'fullName',
+                    string1: 'firstName',
+                    string2: 'lastName'
+                },
+                'string-split': {
+                    type: 'string-split',
+                    title: 'String Split',
+                    varName: 'words',
+                    string: 'sentence',
+                    separator: '" "'
+                },
+                'string-substring': {
+                    type: 'string-substring',
+                    title: 'String Substring',
+                    varName: 'part',
+                    string: 'myString',
+                    start: '0',
+                    end: '5'
+                },
+                'console-log': {
+                    type: 'console-log',
+                    title: 'Console Log',
+                    message: 'Hello World!'
+                },
+                'alert': {
+                    type: 'alert',
+                    title: 'Alert',
+                    message: 'Hello!'
+                },
+                'prompt': {
+                    type: 'prompt',
+                    title: 'Prompt',
+                    varName: 'userInput',
+                    message: 'Enter your name:'
+                },
+                'confirm': {
+                    type: 'confirm',
+                    title: 'Confirm',
+                    varName: 'isConfirmed',
+                    message: 'Are you sure?'
+                },
+                'getelementbyid': {
+                    type: 'getelementbyid',
+                    title: 'Get Element by ID',
+                    elementId: 'myElement',
+                    variableName: 'element'
+                },
+                'queryselector': {
+                    type: 'queryselector',
+                    title: 'Query Selector',
+                    selector: '.my-class',
+                    variableName: 'element'
+                },
+                'addeventlistener': {
+                    type: 'addeventlistener',
+                    title: 'Event Listener',
+                    element: 'button',
+                    event: 'click',
+                    handler: 'console.log("Clicked!");'
+                },
+                'innerhtml': {
+                    type: 'innerhtml',
+                    title: 'innerHTML',
+                    element: 'element',
+                    content: '"<h1>Hello</h1>"'
+                },
+                'style': {
+                    type: 'style',
+                    title: 'Style',
+                    element: 'element',
+                    property: 'color',
+                    value: '"red"'
+                },
+                'settimeout': {
+                    type: 'settimeout',
+                    title: 'setTimeout',
+                    code: 'console.log("Delayed");',
+                    delay: '1000'
+                },
+                'setinterval': {
+                    type: 'setinterval',
+                    title: 'setInterval',
+                    varName: 'intervalId',
+                    code: 'console.log("Repeating");',
+                    interval: '1000'
+                },
+                'math-random': {
+                    type: 'math-random',
+                    title: 'Math Random',
+                    varName: 'randomNum',
+                    min: '1',
+                    max: '10'
+                },
+                'math-round': {
+                    type: 'math-round',
+                    title: 'Math Round',
+                    varName: 'rounded',
+                    value: 'myNumber'
+                }
+            };
+
+            return configs[type] || configs['console-log'];
+        }
+
+        // Render builder area
+        function renderBuilderArea() {
+            const dropZone = document.getElementById('dropZone');
+            
+            if (builderBlocks.length === 0) {
+                dropZone.innerHTML = `
+                    <div class="drop-zone-empty">
+                        <div class="icon">📋</div>
+                        <div>${translations[currentLanguage].dropZoneText}</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            builderBlocks.forEach((block, index) => {
+                const preview = getBlockPreview(block);
+                html += `
+                    <div class="builder-block">
+                        <div class="builder-block-header">
+                            <div class="builder-block-title">
+                                ${block.title}
+                                <span class="block-number">#${index + 1}</span>
+                            </div>
+                            <div class="builder-block-actions">
+                                ${index > 0 ? `<button class="block-btn btn-move" onclick="moveBlockUp(${index})" title="Move Up">⬆️</button>` : ''}
+                                ${index < builderBlocks.length - 1 ? `<button class="block-btn btn-move" onclick="moveBlockDown(${index})" title="Move Down">⬇️</button>` : ''}
+                                <button class="block-btn btn-edit" onclick="editBlock(${index})" title="Edit">✏️</button>
+                                <button class="block-btn btn-delete" onclick="deleteBlock(${index})" title="Delete">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="preview-code">${escapeHtml(preview)}</div>
+                    </div>
+                `;
+            });
+
+            dropZone.innerHTML = html;
+        }
+
+        // Get block preview
+        function getBlockPreview(block) {
+            switch(block.type) {
+                case 'variable':
+                    return `${block.varType} ${block.varName} = ${block.varValue};`;
+                case 'array':
+                    return `let ${block.varName} = [${block.values}];`;
+                case 'object':
+                    return `let ${block.varName} = { ${block.properties} };`;
+                case 'string':
+                    return `let ${block.varName} = "${block.value}";`;
+                case 'for-loop':
+                    return `for (let ${block.variable} = ${block.start}; ${block.variable} < ${block.end}; ${block.variable} += ${block.increment}) { ... }`;
+                case 'while-loop':
+                    return `while (${block.condition}) { ... }`;
+                case 'foreach':
+                    return `${block.arrayName}.forEach(${block.itemName} => { ... });`;
+                case 'for-of':
+                    return `for (const ${block.variable} of ${block.arrayName}) { ... }`;
+                case 'if':
+                    return `if (${block.condition}) { ... }`;
+                case 'if-else':
+                    return `if (${block.condition}) { ... } else { ... }`;
+                case 'if-elseif-else':
+                    return `if (${block.condition1}) { ... } else if (${block.condition2}) { ... } else { ... }`;
+                case 'switch':
+                    return `switch (${block.variable}) { ... }`;
+                case 'ternary':
+                    return `const ${block.varName} = ${block.condition} ? ${block.trueValue} : ${block.falseValue};`;
+                case 'function':
+                    return `function ${block.funcName}(${block.params}) { ... }`;
+                case 'arrow-function':
+                    return `const ${block.funcName} = (${block.params}) => { ... };`;
+                case 'function-call':
+                    return `${block.funcName}(${block.args});`;
+                case 'array-push':
+                    return `${block.arrayName}.push(${block.value});`;
+                case 'array-pop':
+                    return `const ${block.varName} = ${block.arrayName}.pop();`;
+                case 'array-map':
+                    return `const ${block.resultName} = ${block.arrayName}.map(${block.callback});`;
+                case 'array-filter':
+                    return `const ${block.resultName} = ${block.arrayName}.filter(${block.condition});`;
+                case 'array-reduce':
+                    return `const ${block.resultName} = ${block.arrayName}.reduce(${block.callback}, ${block.initial});`;
+                case 'array-find':
+                    return `const ${block.resultName} = ${block.arrayName}.find(${block.condition});`;
+                case 'string-concat':
+                    return `const ${block.varName} = ${block.string1} + " " + ${block.string2};`;
+                case 'string-split':
+                    return `const ${block.varName} = ${block.string}.split(${block.separator});`;
+                case 'string-substring':
+                    return `const ${block.varName} = ${block.string}.substring(${block.start}, ${block.end});`;
+                case 'console-log':
+                    return `console.log("${block.message}");`;
+                case 'alert':
+                    return `alert("${block.message}");`;
+                case 'prompt':
+                    return `const ${block.varName} = prompt("${block.message}");`;
+                case 'confirm':
+                    return `const ${block.varName} = confirm("${block.message}");`;
+                case 'getelementbyid':
+                    return `const ${block.variableName} = document.getElementById("${block.elementId}");`;
+                case 'queryselector':
+                    return `const ${block.variableName} = document.querySelector("${block.selector}");`;
+                case 'addeventlistener':
+                    return `${block.element}.addEventListener("${block.event}", () => { ... });`;
+                case 'innerhtml':
+                    return `${block.element}.innerHTML = ${block.content};`;
+                case 'style':
+                    return `${block.element}.style.${block.property} = ${block.value};`;
+                case 'settimeout':
+                    return `setTimeout(() => { ... }, ${block.delay});`;
+                case 'setinterval':
+                    return `const ${block.varName} = setInterval(() => { ... }, ${block.interval});`;
+                case 'math-random':
+                    return `const ${block.varName} = Math.floor(Math.random() * (${block.max} - ${block.min} + 1)) + ${block.min};`;
+                case 'math-round':
+                    return `const ${block.varName} = Math.round(${block.value});`;
+                default:
+                    return block.title;
+            }
+        }
+
+        // Edit block
+        function editBlock(index) {
+            currentEditingIndex = index;
+            const block = builderBlocks[index];
+            showConfigModal(block);
+        }
+
+        // Show configuration modal
+        function showConfigModal(block) {
+            const modal = document.getElementById('configModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalForm = document.getElementById('modalForm');
+
+            modalTitle.innerHTML = `⚙️ Configure ${block.title}`;
+            modalForm.innerHTML = generateFormForBlock(block);
+            modal.classList.add('show');
+        }
+
+        // Generate form for block
+        function generateFormForBlock(block) {
+            let html = '';
+            const formFields = getFormFieldsForType(block.type);
+
+            formFields.forEach(field => {
+                const value = block[field.id] || '';
+                html += `
+                    <div class="form-group">
+                        <label>${field.label}:</label>
+                        ${field.type === 'textarea' 
+                            ? `<textarea id="${field.id}">${escapeHtml(value)}</textarea>`
+                            : field.type === 'select'
+                            ? `<select id="${field.id}">
+                                ${field.options.map(opt => 
+                                    `<option value="${opt.value}" ${value === opt.value ? 'selected' : ''}>${opt.label}</option>`
+                                ).join('')}
+                               </select>`
+                            : `<input type="text" id="${field.id}" value="${escapeHtml(value)}">`
+                        }
+                        ${field.hint ? `<div class="form-hint">${field.hint}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            return html;
+        }
+
+        // Get form fields for block type
+        function getFormFieldsForType(type) {
+            const fields = {
+                'variable': [
+                    { id: 'varType', label: 'Type', type: 'select', options: [
+                        { value: 'let', label: 'let' },
+                        { value: 'const', label: 'const' },
+                        { value: 'var', label: 'var' }
+                    ]},
+                    { id: 'varName', label: 'Variable Name', type: 'text' },
+                    { id: 'varValue', label: 'Value', type: 'text' }
+                ],
+                'array': [
+                    { id: 'varName', label: 'Array Name', type: 'text' },
+                    { id: 'values', label: 'Values (comma separated)', type: 'text', hint: 'Example: 1, 2, 3, 4, 5' }
+                ],
+                'object': [
+                    { id: 'varName', label: 'Object Name', type: 'text' },
+                    { id: 'properties', label: 'Properties', type: 'text', hint: 'Example: name: "John", age: 30' }
+                ],
+                'string': [
+                    { id: 'varName', label: 'Variable Name', type: 'text' },
+                    { id: 'value', label: 'String Value', type: 'text' }
+                ],
+                'for-loop': [
+                    { id: 'variable', label: 'Variable', type: 'text' },
+                    { id: 'start', label: 'Start', type: 'text' },
+                    { id: 'end', label: 'End', type: 'text' },
+                    { id: 'increment', label: 'Increment', type: 'text' },
+                    { id: 'body', label: 'Loop Body', type: 'textarea' }
+                ],
+                'while-loop': [
+                    { id: 'condition', label: 'Condition', type: 'text' },
+                    { id: 'body', label: 'Loop Body', type: 'textarea' }
+                ],
+                'foreach': [
+                    { id: 'arrayName', label: 'Array Name', type: 'text' },
+                    { id: 'itemName', label: 'Item Variable', type: 'text' },
+                    { id: 'body', label: 'Loop Body', type: 'textarea' }
+                ],
+                'for-of': [
+                    { id: 'variable', label: 'Variable', type: 'text' },
+                    { id: 'arrayName', label: 'Array Name', type: 'text' },
+                    { id: 'body', label: 'Loop Body', type: 'textarea' }
+                ],
+                'if': [
+                    { id: 'condition', label: 'Condition', type: 'text' },
+                    { id: 'body', label: 'If Body', type: 'textarea' }
+                ],
+                'if-else': [
+                    { id: 'condition', label: 'Condition', type: 'text' },
+                    { id: 'ifBody', label: 'If Body', type: 'textarea' },
+                    { id: 'elseBody', label: 'Else Body', type: 'textarea' }
+                ],
+                'if-elseif-else': [
+                    { id: 'condition1', label: 'First Condition', type: 'text' },
+                    { id: 'body1', label: 'First Body', type: 'textarea' },
+                    { id: 'condition2', label: 'Second Condition', type: 'text' },
+                    { id: 'body2', label: 'Second Body', type: 'textarea' },
+                    { id: 'elseBody', label: 'Else Body', type: 'textarea' }
+                ],
+                'switch': [
+                    { id: 'variable', label: 'Variable', type: 'text' },
+                    { id: 'cases', label: 'Cases', type: 'textarea', hint: 'Example: case 1: console.log("One"); break;' }
+                ],
+                'ternary': [
+                    { id: 'varName', label: 'Variable Name', type: 'text' },
+                    { id: 'condition', label: 'Condition', type: 'text' },
+                    { id: 'trueValue', label: 'True Value', type: 'text' },
+                    { id: 'falseValue', label: 'False Value', type: 'text' }
+                ],
+                'function': [
+                    { id: 'funcName', label: 'Function Name', type: 'text' },
+                    { id: 'params', label: 'Parameters (comma separated)', type: 'text' },
+                    { id: 'body', label: 'Function Body', type: 'textarea' }
+                ],
+                'arrow-function': [
+                    { id: 'funcName', label: 'Function Name', type: 'text' },
+                    { id: 'params', label: 'Parameters', type: 'text' },
+                    { id: 'body', label: 'Function Body', type: 'textarea' }
+                ],
+                'function-call': [
+                    { id: 'funcName', label: 'Function Name', type: 'text' },
+                    { id: 'args', label: 'Arguments (comma separated)', type: 'text' }
+                ],
+                'array-push': [
+                    { id: 'arrayName', label: 'Array Name', type: 'text' },
+                    { id: 'value', label: 'Value to Push', type: 'text' }
+                ],
+                'array-pop': [
+                    { id: 'arrayName', label: 'Array Name', type: 'text' },
+                    { id: 'varName', label: 'Result Variable', type: 'text' }
+                ],
+                'array-map': [
+                    { id: 'arrayName', label: 'Array Name', type: 'text' },
+                    { id: 'resultName', label: 'Result Variable', type: 'text' },
+                    { id: 'callback', label: 'Callback Function', type: 'text', hint: 'Example: item => item * 2' }
+                ],
+                'array-filter': [
+                    { id: 'arrayName', label: 'Array Name', type: 'text' },
+                    { id: 'resultName', label: 'Result Variable', type: 'text' },
+                    { id: 'condition', label: 'Filter Condition', type: 'text', hint: 'Example: item => item > 5' }
+                ],
+                'array-reduce': [
+                    { id: 'arrayName', label: 'Array Name', type: 'text' },
+                    { id: 'resultName', label: 'Result Variable', type: 'text' },
+                    { id: 'callback', label: 'Callback Function', type: 'text', hint: 'Example: (acc, item) => acc + item' },
+                    { id: 'initial', label: 'Initial Value', type: 'text' }
+                ],
+                'array-find': [
+                    { id: 'arrayName', label: 'Array Name', type: 'text' },
+                    { id: 'resultName', label: 'Result Variable', type: 'text' },
+                    { id: 'condition', label: 'Find Condition', type: 'text', hint: 'Example: item => item > 5' }
+                ],
+                'string-concat': [
+                    { id: 'varName', label: 'Result Variable', type: 'text' },
+                    { id: 'string1', label: 'First String', type: 'text' },
+                    { id: 'string2', label: 'Second String', type: 'text' }
+                ],
+                'string-split': [
+                    { id: 'varName', label: 'Result Variable', type: 'text' },
+                    { id: 'string', label: 'String to Split', type: 'text' },
+                    { id: 'separator', label: 'Separator', type: 'text', hint: 'Example: " " or "," ' }
+                ],
+                'string-substring': [
+                    { id: 'varName', label: 'Result Variable', type: 'text' },
+                    { id: 'string', label: 'String', type: 'text' },
+                    { id: 'start', label: 'Start Index', type: 'text' },
+                    { id: 'end', label: 'End Index', type: 'text' }
+                ],
+                'console-log': [
+                    { id: 'message', label: 'Message', type: 'text' }
+                ],
+                'alert': [
+                    { id: 'message', label: 'Message', type: 'text' }
+                ],
+                'prompt': [
+                    { id: 'varName', label: 'Variable Name', type: 'text' },
+                    { id: 'message', label: 'Prompt Message', type: 'text' }
+                ],
+                'confirm': [
+                    { id: 'varName', label: 'Variable Name', type: 'text' },
+                    { id: 'message', label: 'Confirm Message', type: 'text' }
+                ],
+                'getelementbyid': [
+                    { id: 'variableName', label: 'Variable Name', type: 'text' },
+                    { id: 'elementId', label: 'Element ID', type: 'text' }
+                ],
+                'queryselector': [
+                    { id: 'variableName', label: 'Variable Name', type: 'text' },
+                    { id: 'selector', label: 'CSS Selector', type: 'text', hint: 'Example: .my-class or #my-id' }
+                ],
+                'addeventlistener': [
+                    { id: 'element', label: 'Element Variable', type: 'text' },
+                    { id: 'event', label: 'Event Type', type: 'text', hint: 'Example: click, mouseover, keydown' },
+                    { id: 'handler', label: 'Event Handler', type: 'textarea' }
+                ],
+                'innerhtml': [
+                    { id: 'element', label: 'Element Variable', type: 'text' },
+                    { id: 'content', label: 'HTML Content', type: 'text' }
+                ],
+                'style': [
+                    { id: 'element', label: 'Element Variable', type: 'text' },
+                    { id: 'property', label: 'CSS Property', type: 'text', hint: 'Example: color, fontSize, backgroundColor' },
+                    { id: 'value', label: 'CSS Value', type: 'text' }
+                ],
+                'settimeout': [
+                    { id: 'code', label: 'Code to Execute', type: 'textarea' },
+                    { id: 'delay', label: 'Delay (milliseconds)', type: 'text', hint: '1000 = 1 second' }
+                ],
+                'setinterval': [
+                    { id: 'varName', label: 'Interval Variable', type: 'text' },
+                    { id: 'code', label: 'Code to Execute', type: 'textarea' },
+                    { id: 'interval', label: 'Interval (milliseconds)', type: 'text', hint: '1000 = 1 second' }
+                ],
+                'math-random': [
+                    { id: 'varName', label: 'Variable Name', type: 'text' },
+                    { id: 'min', label: 'Minimum Value', type: 'text' },
+                    { id: 'max', label: 'Maximum Value', type: 'text' }
+                ],
+                'math-round': [
+                    { id: 'varName', label: 'Variable Name', type: 'text' },
+                    { id: 'value', label: 'Value to Round', type: 'text' }
+                ]
+            };
+
+            return fields[type] || [
+                { id: 'message', label: 'Configuration', type: 'text' }
+            ];
+        }
+
+        // Save block configuration
+        function saveBlockConfig() {
+            if (currentEditingIndex >= 0) {
+                const block = builderBlocks[currentEditingIndex];
+                const form = document.getElementById('modalForm');
+                
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.id && block.hasOwnProperty(input.id)) {
+                        block[input.id] = input.value;
+                    }
+                });
+                
+                renderBuilderArea();
+                generateCode();
+                closeModal();
+                showNotification('✅ Block updated successfully!', 'success');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('configModal').classList.remove('show');
+            currentEditingIndex = -1;
+        }
+
+        // Delete block
+        function deleteBlock(index) {
+            if (confirm(currentLanguage === 'bn' ? 'এই ব্লকটি মুছে ফেলবেন?' : 'Delete this block?')) {
+                builderBlocks.splice(index, 1);
+                renderBuilderArea();
+                updateBlockCount();
+                generateCode();
+                showNotification('🗑️ Block deleted!', 'success');
+            }
+        }
+
+        // Move block up
+        function moveBlockUp(index) {
+            if (index > 0) {
+                [builderBlocks[index], builderBlocks[index - 1]] = [builderBlocks[index - 1], builderBlocks[index]];
+                renderBuilderArea();
+                generateCode();
+            }
+        }
+
+        // Move block down
+        function moveBlockDown(index) {
+            if (index < builderBlocks.length - 1) {
+                [builderBlocks[index], builderBlocks[index + 1]] = [builderBlocks[index + 1], builderBlocks[index]];
+                renderBuilderArea();
+                generateCode();
+            }
+        }
+
+        // Update block count
+        function updateBlockCount() {
+            const countText = currentLanguage === 'bn' ? `${builderBlocks.length} টি ব্লক` : `${builderBlocks.length} blocks`;
+            document.getElementById('blockCount').textContent = countText;
+        }
+
+        // Generate code
+        function generateCode() {
+            const output = document.getElementById('codeOutput');
+            
+            if (builderBlocks.length === 0) {
+                output.innerHTML = `
+                    <div class="code-line">
+                        <span class="line-number">1</span>
+                        <span class="comment">// Your code will appear here...</span>
+                    </div>
+                    <div class="code-line">
+                        <span class="line-number">2</span>
+                        <span class="comment">// Drag blocks from the left panel</span>
+                    </div>
+                    <div class="code-line">
+                        <span class="line-number">3</span>
+                        <span class="comment">// Click Generate to create code</span>
+                    </div>
+                `;
+                return;
+            }
+
+            let code = '';
+            
+            builderBlocks.forEach(block => {
+                code += generateBlockCode(block) + '\n\n';
+            });
+
+            output.innerHTML = highlightCode(code);
+        }
+
+        // Generate block code
+        function generateBlockCode(block) {
+            switch(block.type) {
+                case 'variable':
+                    return `${block.varType} ${block.varName} = ${block.varValue};`;
+                
+                case 'array':
+                    return `let ${block.varName} = [${block.values}];`;
+                
+                case 'object':
+                    return `let ${block.varName} = { ${block.properties} };`;
+                
+                case 'string':
+                    return `let ${block.varName} = "${block.value}";`;
+                
+                case 'for-loop':
+                    return `for (let ${block.variable} = ${block.start}; ${block.variable} < ${block.end}; ${block.variable} += ${block.increment}) {\n  ${block.body}\n}`;
+                
+                case 'while-loop':
+                    return `while (${block.condition}) {\n  ${block.body}\n}`;
+                
+                case 'foreach':
+                    return `${block.arrayName}.forEach(${block.itemName} => {\n  ${block.body}\n});`;
+                
+                case 'for-of':
+                    return `for (const ${block.variable} of ${block.arrayName}) {\n  ${block.body}\n}`;
+                
+                case 'if':
+                    return `if (${block.condition}) {\n  ${block.body}\n}`;
+                
+                case 'if-else':
+                    return `if (${block.condition}) {\n  ${block.ifBody}\n} else {\n  ${block.elseBody}\n}`;
+                
+                case 'if-elseif-else':
+                    return `if (${block.condition1}) {\n  ${block.body1}\n} else if (${block.condition2}) {\n  ${block.body2}\n} else {\n  ${block.elseBody}\n}`;
+                
+                case 'switch':
+                    return `switch (${block.variable}) {\n  ${block.cases}\n}`;
+                
+                case 'ternary':
+                    return `const ${block.varName} = ${block.condition} ? ${block.trueValue} : ${block.falseValue};`;
+                
+                case 'function':
+                    return `function ${block.funcName}(${block.params}) {\n  ${block.body}\n}`;
+                
+                case 'arrow-function':
+                    return `const ${block.funcName} = (${block.params}) => {\n  ${block.body}\n};`;
+                
+                case 'function-call':
+                    return `${block.funcName}(${block.args});`;
+                
+                case 'array-push':
+                    return `${block.arrayName}.push(${block.value});`;
+                
+                case 'array-pop':
+                    return `const ${block.varName} = ${block.arrayName}.pop();`;
+                
+                case 'array-map':
+                    return `const ${block.resultName} = ${block.arrayName}.map(${block.callback});`;
+                
+                case 'array-filter':
+                    return `const ${block.resultName} = ${block.arrayName}.filter(${block.condition});`;
+                
+                case 'array-reduce':
+                    return `const ${block.resultName} = ${block.arrayName}.reduce(${block.callback}, ${block.initial});`;
+                
+                case 'array-find':
+                    return `const ${block.resultName} = ${block.arrayName}.find(${block.condition});`;
+                
+                case 'string-concat':
+                    return `const ${block.varName} = ${block.string1} + " " + ${block.string2};`;
+                
+                case 'string-split':
+                    return `const ${block.varName} = ${block.string}.split(${block.separator});`;
+                
+                case 'string-substring':
+                    return `const ${block.varName} = ${block.string}.substring(${block.start}, ${block.end});`;
+                
+                case 'console-log':
+                    return `console.log("${block.message}");`;
+                
+                case 'alert':
+                    return `alert("${block.message}");`;
+                
+                case 'prompt':
+                    return `const ${block.varName} = prompt("${block.message}");`;
+                
+                case 'confirm':
+                    return `const ${block.varName} = confirm("${block.message}");`;
+                
+                case 'getelementbyid':
+                    return `const ${block.variableName} = document.getElementById("${block.elementId}");`;
+                
+                case 'queryselector':
+                    return `const ${block.variableName} = document.querySelector("${block.selector}");`;
+                
+                case 'addeventlistener':
+                    return `${block.element}.addEventListener("${block.event}", () => {\n  ${block.handler}\n});`;
+                
+                case 'innerhtml':
+                    return `${block.element}.innerHTML = ${block.content};`;
+                
+                case 'style':
+                    return `${block.element}.style.${block.property} = ${block.value};`;
+                
+                case 'settimeout':
+                    return `setTimeout(() => {\n  ${block.code}\n}, ${block.delay});`;
+                
+                case 'setinterval':
+                    return `const ${block.varName} = setInterval(() => {\n  ${block.code}\n}, ${block.interval});`;
+                
+                case 'math-random':
+                    return `const ${block.varName} = Math.floor(Math.random() * (${block.max} - ${block.min} + 1)) + ${block.min};`;
+                
+                case 'math-round':
+                    return `const ${block.varName} = Math.round(${block.value});`;
+                
+                default:
+                    return `// ${block.title}`;
+            }
+        }
+
+        // Highlight code with line numbers
+        function highlightCode(code) {
+            const lines = code.split('\n');
+            let html = '';
+            
+            lines.forEach((line, index) => {
+                let highlightedLine = line;
+                
+                // Keywords
+                highlightedLine = highlightedLine.replace(/\b(let|const|var|function|if|else|for|while|return|switch|case|break|continue|new|class|extends|import|export|default|async|await|try|catch|finally|throw|typeof|instanceof|delete|void|yield)\b/g, '<span class="keyword">$1</span>');
+                
+                // Functions
+                highlightedLine = highlightedLine.replace(/\b(console|alert|prompt|confirm|document|window|Math|Array|Object|String|Number|Boolean|Date|setTimeout|setInterval|clearTimeout|clearInterval|addEventListener|getElementById|querySelector|push|pop|shift|unshift|map|filter|reduce|forEach|find|indexOf|includes|join|split|slice|substring|toLowerCase|toUpperCase|trim|replace|match|floor|ceil|round|random|abs|max|min|pow|sqrt)\b/g, '<span class="function">$1</span>');
+                
+                // Strings
+                highlightedLine = highlightedLine.replace(/(["'`])(?:(?=(\\?))\2.)*?\1/g, '<span class="string">$&</span>');
+                
+                // Numbers
+                highlightedLine = highlightedLine.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
+                
+                // Comments
+                highlightedLine = highlightedLine.replace(/(\/\/.*$)/g, '<span class="comment">$1</span>');
+                
+                // Operators
+                highlightedLine = highlightedLine.replace(/([+\-*/%=<>!&|?:]+)/g, '<span class="operator">$1</span>');
+                
+                html += `<div class="code-line"><span class="line-number">${index + 1}</span>${highlightedLine}</div>`;
+            });
+            
+            return html;
+        }
+
+        // Copy code
+        function copyCode() {
+            const output = document.getElementById('codeOutput');
+            const text = output.innerText.split('\n').map(line => {
+                // Remove line numbers (first few characters)
+                return line.replace(/^\s*\d+\s*/, '');
+            }).join('\n');
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('✅ Code copied to clipboard!', 'success');
+            }).catch(err => {
+                showNotification('❌ Failed to copy code!', 'error');
+            });
+        }
+
+        // Download code
+        function downloadCode() {
+            const output = document.getElementById('codeOutput');
+            const text = output.innerText.split('\n').map(line => {
+                return line.replace(/^\s*\d+\s*/, '');
+            }).join('\n');
+            
+            const blob = new Blob([text], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated-code.js';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('💾 Code downloaded!', 'success');
+        }
+
+        // Run code
+        function runCode() {
+            const output = document.getElementById('codeOutput');
+            const text = output.innerText.split('\n').map(line => {
+                return line.replace(/^\s*\d+\s*/, '');
+            }).join('\n');
+            
+            try {
+                // Create a function to isolate the code execution
+                const runFunction = new Function(text);
+                runFunction();
+                showNotification('✅ Code executed! Check console (F12)', 'success');
+            } catch (error) {
+                showNotification('❌ Error: ' + error.message, 'error');
+                console.error('Execution error:', error);
+            }
+        }
+
+        // Clear all blocks
+        function clearAll() {
+            const confirmText = currentLanguage === 'bn' ? 'সব ব্লক মুছে ফেলবেন?' : 'Clear all blocks?';
+            if (confirm(confirmText)) {
+                builderBlocks = [];
+                renderBuilderArea();
+                updateBlockCount();
+                generateCode();
+                showNotification('🗑️ All blocks cleared!', 'success');
+            }
+        }
+
+        // Save project
+        function saveProject() {
+            const data = JSON.stringify(builderBlocks, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'code-builder-project.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('💾 Project saved successfully!', 'success');
+        }
+
+        // Load project
+        function loadProject() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (Array.isArray(data)) {
+                                builderBlocks = data;
+                                renderBuilderArea();
+                                updateBlockCount();
+                                generateCode();
+                                showNotification('📁 Project loaded successfully!', 'success');
+                            } else {
+                                showNotification('❌ Invalid project file!', 'error');
+                            }
+                        } catch (error) {
+                            showNotification('❌ Failed to load project!', 'error');
+                            console.error('Load error:', error);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            
+            input.click();
+        }
+
+        // Filter blocks
+        function filterBlocks() {
+            const search = document.getElementById('searchBlocks').value.toLowerCase();
+            const blocks = document.querySelectorAll('.code-block');
+            const categories = document.querySelectorAll('.category');
+            
+            categories.forEach(category => {
+                let hasVisibleBlocks = false;
+                const categoryBlocks = category.querySelectorAll('.code-block');
+                
+                categoryBlocks.forEach(block => {
+                    const text = block.textContent.toLowerCase();
+                    const isVisible = text.includes(search);
+                    block.style.display = isVisible ? 'block' : 'none';
+                    if (isVisible) hasVisibleBlocks = true;
+                });
+                
+                category.style.display = hasVisibleBlocks ? 'block' : 'none';
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Toggle language
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'bn' ? 'en' : 'bn';
+            updateLanguage();
+            renderBuilderArea();
+            updateBlockCount();
+        }
+
+        // Update language
+        function updateLanguage() {
+            const trans = translations[currentLanguage];
+            
+            document.getElementById('headerSubtitle').textContent = trans.headerSubtitle;
+            document.getElementById('builderText').textContent = trans.builderText;
+            document.getElementById('generateText').textContent = trans.generateText;
+            document.getElementById('saveText').textContent = trans.saveText;
+            document.getElementById('loadText').textContent = trans.loadText;
+            document.getElementById('clearText').textContent = trans.clearText;
+            document.getElementById('codeTitle').textContent = trans.codeTitle;
+            document.getElementById('copyText').textContent = trans.copyText;
+            document.getElementById('downloadText').textContent = trans.downloadText;
+            document.getElementById('runText').textContent = trans.runText;
+            document.getElementById('modalSave').textContent = trans.modalSave;
+            document.getElementById('modalCancel').textContent = trans.modalCancel;
+            document.getElementById('langText').textContent = trans.langText;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initDragAndDrop();
+            updateBlockCount();
+            generateCode();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('configModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 's') {
+                    e.preventDefault();
+                    saveProject();
+                } else if (e.key === 'g') {
+                    e.preventDefault();
+                    generateCode();
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
