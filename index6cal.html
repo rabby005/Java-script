@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Code Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 0;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2d3748;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a202c;
+        }
+
+        .header {
+            background: #2d3748;
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #4a5568;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .split-view {
+            flex: 1;
+            display: flex;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .editor-panel, .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a202c;
+        }
+
+        .panel-header {
+            background: #2d3748;
+            padding: 10px 15px;
+            color: #a0aec0;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .code-editor {
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 15px;
+            overflow: auto;
+            border: none;
+            resize: none;
+            line-height: 1.6;
+        }
+
+        .code-editor:focus {
+            outline: none;
+        }
+
+        .preview-frame {
+            flex: 1;
+            background: white;
+            border: none;
+            width: 100%;
+        }
+
+        .sidebar h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #90cdf4;
+            border-bottom: 2px solid #4a5568;
+            padding-bottom: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #cbd5e0;
+        }
+
+        .control-group input,
+        .control-group select,
+        .control-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            background: #4a5568;
+            border: 1px solid #718096;
+            border-radius: 4px;
+            color: white;
+            font-size: 13px;
+        }
+
+        .control-group textarea {
+            resize: vertical;
+            min-height: 60px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus,
+        .control-group textarea:focus {
+            outline: none;
+            border-color: #90cdf4;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #3182ce;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background: #48bb78;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #f56565;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn-secondary {
+            background: #718096;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+
+        .template-btn {
+            width: 100%;
+            margin-bottom: 8px;
+            text-align: left;
+            padding: 12px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #4a5568;
+            margin: 20px 0;
+        }
+
+        .error-console {
+            background: #2d3748;
+            color: #fc8181;
+            padding: 10px 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 100px;
+            overflow-y: auto;
+            border-top: 2px solid #e53e3e;
+        }
+
+        .console-item {
+            padding: 4px 0;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .console-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>🎨 GUI Builder</h2>
+            
+            <div class="control-group">
+                <label>Quick Templates:</label>
+                <button class="template-btn" id="btnHello">Hello World</button>
+                <button class="template-btn" id="btnCalculator">Calculator</button>
+                <button class="template-btn" id="btnTodo">Todo List</button>
+                <button class="template-btn" id="btnAnimation">Animation</button>
+                <button class="template-btn" id="btnCounter">Counter App</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <h2>⚙️ Settings</h2>
+            
+            <div class="control-group">
+                <label>Background Color:</label>
+                <input type="color" id="bgColor" value="#ffffff">
+            </div>
+
+            <div class="control-group">
+                <label>Text Color:</label>
+                <input type="color" id="textColor" value="#000000">
+            </div>
+
+            <div class="control-group">
+                <label>Font Size (px):</label>
+                <input type="number" id="fontSize" value="16" min="10" max="32">
+            </div>
+
+            <div class="control-group">
+                <label>Add Custom CSS:</label>
+                <textarea id="customCSS" placeholder="Enter custom CSS..."></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <button class="btn-success" id="btnRun" style="width: 100%; margin-bottom: 10px;">▶ Run Code</button>
+            <button class="btn-danger" id="btnClearPreview" style="width: 100%; margin-bottom: 10px;">🗑️ Clear Preview</button>
+            <button class="btn-secondary" id="btnDownload" style="width: 100%;">💾 Download HTML</button>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>JavaScript Code Builder</h1>
+                <div class="header-buttons">
+                    <button id="btnRunHeader">▶ Run</button>
+                    <button class="btn-secondary" id="btnClearCode">Clear Code</button>
+                </div>
+            </div>
+
+            <div class="split-view">
+                <div class="editor-panel">
+                    <div class="panel-header">📝 Code Editor (HTML + CSS + JavaScript)</div>
+                    <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
+                    <div id="errorConsole" class="error-console" style="display: none;"></div>
+                </div>
+
+                <div class="preview-panel">
+                    <div class="panel-header">👁️ Live Preview</div>
+                    <iframe class="preview-frame" id="previewFrame"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var codeEditor = document.getElementById('codeEditor');
+        var previewFrame = document.getElementById('previewFrame');
+        var errorConsole = document.getElementById('errorConsole');
+        var bgColor = document.getElementById('bgColor');
+        var textColor = document.getElementById('textColor');
+        var fontSize = document.getElementById('fontSize');
+        var customCSS = document.getElementById('customCSS');
+        
+        var templates = {
+            hello: '<div id="app">\n  <h1>Hello World! 👋</h1>\n  <p>Welcome to JavaScript Builder</p>\n  <button onclick="showMessage()">Click Me</button>\n</div>\n\n<style>\n  #app {\n    text-align: center;\n    padding: 50px;\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    color: white;\n    border-radius: 10px;\n    max-width: 500px;\n    margin: 50px auto;\n  }\n  button {\n    padding: 12px 30px;\n    font-size: 18px;\n    background: white;\n    color: #667eea;\n    border: none;\n    border-radius: 5px;\n    cursor: pointer;\n    font-weight: bold;\n    transition: transform 0.2s;\n  }\n  button:hover {\n    transform: scale(1.05);\n  }\n</style>\n\n<script>\n  function showMessage() {\n    alert(\'Hello from JavaScript Builder! 🎉\');\n  }\n<\/script>',
+            
+            calculator: '<div class="calculator">\n  <input type="text" id="display" readonly>\n  <div class="buttons">\n    <button onclick="clearDisplay()">C</button>\n    <button onclick="appendToDisplay(\'/\')">÷</button>\n    <button onclick="appendToDisplay(\'*\')">×</button>\n    <button onclick="deleteLast()">←</button>\n    \n    <button onclick="appendToDisplay(\'7\')">7</button>\n    <button onclick="appendToDisplay(\'8\')">8</button>\n    <button onclick="appendToDisplay(\'9\')">9</button>\n    <button onclick="appendToDisplay(\'-\')">-</button>\n    \n    <button onclick="appendToDisplay(\'4\')">4</button>\n    <button onclick="appendToDisplay(\'5\')">5</button>\n    <button onclick="appendToDisplay(\'6\')">6</button>\n    <button onclick="appendToDisplay(\'+\')">+</button>\n    \n    <button onclick="appendToDisplay(\'1\')">1</button>\n    <button onclick="appendToDisplay(\'2\')">2</button>\n    <button onclick="appendToDisplay(\'3\')">3</button>\n    <button onclick="calculate()" class="equals">=</button>\n    \n    <button onclick="appendToDisplay(\'0\')" style="grid-column: span 2">0</button>\n    <button onclick="appendToDisplay(\'.\')">.</button>\n  </div>\n</div>\n\n<style>\n  .calculator {\n    max-width: 300px;\n    margin: 50px auto;\n    background: #2d3748;\n    padding: 20px;\n    border-radius: 10px;\n    box-shadow: 0 10px 30px rgba(0,0,0,0.3);\n  }\n  #display {\n    width: 100%;\n    padding: 20px;\n    font-size: 24px;\n    text-align: right;\n    border: none;\n    background: #1a202c;\n    color: white;\n    border-radius: 5px;\n    margin-bottom: 10px;\n    box-sizing: border-box;\n  }\n  .buttons {\n    display: grid;\n    grid-template-columns: repeat(4, 1fr);\n    gap: 10px;\n  }\n  button {\n    padding: 20px;\n    font-size: 18px;\n    border: none;\n    background: #4a5568;\n    color: white;\n    border-radius: 5px;\n    cursor: pointer;\n  }\n  button:hover {\n    background: #718096;\n  }\n  .equals {\n    background: #48bb78;\n    grid-row: span 2;\n  }\n</style>\n\n<script>\n  function appendToDisplay(value) {\n    document.getElementById(\'display\').value += value;\n  }\n  function clearDisplay() {\n    document.getElementById(\'display\').value = \'\';\n  }\n  function deleteLast() {\n    var display = document.getElementById(\'display\');\n    display.value = display.value.slice(0, -1);\n  }\n  function calculate() {\n    try {\n      var display = document.getElementById(\'display\');\n      display.value = eval(display.value);\n    } catch (error) {\n      alert(\'Invalid expression\');\n      clearDisplay();\n    }\n  }\n<\/script>',
+            
+            todo: '<div class="todo-app">\n  <h1>📝 Todo List</h1>\n  <div class="input-group">\n    <input type="text" id="todoInput" placeholder="Add a new task...">\n    <button onclick="addTodo()">Add</button>\n  </div>\n  <ul id="todoList"></ul>\n</div>\n\n<style>\n  .todo-app {\n    max-width: 500px;\n    margin: 50px auto;\n    background: white;\n    padding: 30px;\n    border-radius: 10px;\n    box-shadow: 0 10px 30px rgba(0,0,0,0.1);\n  }\n  h1 {\n    text-align: center;\n    color: #2d3748;\n    margin-bottom: 20px;\n  }\n  .input-group {\n    display: flex;\n    gap: 10px;\n    margin-bottom: 20px;\n  }\n  input {\n    flex: 1;\n    padding: 12px;\n    border: 2px solid #e2e8f0;\n    border-radius: 5px;\n    font-size: 16px;\n  }\n  button {\n    padding: 12px 24px;\n    background: #4299e1;\n    color: white;\n    border: none;\n    border-radius: 5px;\n    cursor: pointer;\n    font-size: 16px;\n  }\n  #todoList {\n    list-style: none;\n    padding: 0;\n  }\n  .todo-item {\n    padding: 15px;\n    background: #f7fafc;\n    margin-bottom: 10px;\n    border-radius: 5px;\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n  }\n  .delete-btn {\n    background: #f56565;\n    padding: 8px 15px;\n    font-size: 14px;\n  }\n</style>\n\n<script>\n  function addTodo() {\n    var input = document.getElementById(\'todoInput\');\n    var text = input.value.trim();\n    if (text === \'\') {\n      alert(\'Please enter a task!\');\n      return;\n    }\n    var li = document.createElement(\'li\');\n    li.className = \'todo-item\';\n    li.innerHTML = \'<span>\' + text + \'</span><button class="delete-btn" onclick="this.parentElement.remove()">Delete</button>\';\n    document.getElementById(\'todoList\').appendChild(li);\n    input.value = \'\';\n  }\n  document.getElementById(\'todoInput\').addEventListener(\'keypress\', function(e) {\n    if (e.key === \'Enter\') addTodo();\n  });\n<\/script>',
+            
+            animation: '<div class="animation-container">\n  <div class="box" id="box"></div>\n  <div class="controls">\n    <button onclick="moveBox()">Move</button>\n    <button onclick="rotateBox()">Rotate</button>\n    <button onclick="scaleBox()">Scale</button>\n    <button onclick="resetBox()">Reset</button>\n  </div>\n</div>\n\n<style>\n  .animation-container {\n    text-align: center;\n    padding: 50px;\n  }\n  .box {\n    width: 100px;\n    height: 100px;\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    margin: 50px auto;\n    border-radius: 10px;\n    transition: all 0.5s ease;\n  }\n  .controls {\n    display: flex;\n    gap: 10px;\n    justify-content: center;\n    flex-wrap: wrap;\n  }\n  button {\n    padding: 12px 24px;\n    font-size: 16px;\n    background: #4299e1;\n    color: white;\n    border: none;\n    border-radius: 5px;\n    cursor: pointer;\n  }\n</style>\n\n<script>\n  var box = document.getElementById(\'box\');\n  function moveBox() {\n    var x = Math.random() * 300 - 150;\n    var y = Math.random() * 300 - 150;\n    box.style.transform = \'translate(\' + x + \'px, \' + y + \'px)\';\n  }\n  function rotateBox() {\n    var rotation = Math.random() * 360;\n    box.style.transform = \'rotate(\' + rotation + \'deg)\';\n  }\n  function scaleBox() {\n    var scale = Math.random() * 1.5 + 0.5;\n    box.style.transform = \'scale(\' + scale + \')\';\n  }\n  function resetBox() {\n    box.style.transform = \'none\';\n  }\n<\/script>',
+            
+            counter: '<div class="counter-app">\n  <h1>Counter App</h1>\n  <div class="counter-display" id="counter">0</div>\n  <div class="controls">\n    <button onclick="decrement()">- Decrease</button>\n    <button onclick="reset()" class="reset">Reset</button>\n    <button onclick="increment()">+ Increase</button>\n  </div>\n</div>\n\n<style>\n  .counter-app {\n    max-width: 400px;\n    margin: 100px auto;\n    text-align: center;\n    background: white;\n    padding: 40px;\n    border-radius: 15px;\n    box-shadow: 0 10px 40px rgba(0,0,0,0.1);\n  }\n  h1 {\n    color: #2d3748;\n    margin-bottom: 30px;\n  }\n  .counter-display {\n    font-size: 72px;\n    font-weight: bold;\n    color: #4299e1;\n    margin: 30px 0;\n  }\n  .controls {\n    display: flex;\n    gap: 10px;\n    justify-content: center;\n  }\n  button {\n    padding: 15px 25px;\n    font-size: 16px;\n    background: #4299e1;\n    color: white;\n    border: none;\n    border-radius: 8px;\n    cursor: pointer;\n    font-weight: 600;\n  }\n  button:hover {\n    background: #3182ce;\n  }\n  .reset {\n    background: #718096;\n  }\n</style>\n\n<script>\n  var count = 0;\n  function updateDisplay() {\n    document.getElementById(\'counter\').textContent = count;\n  }\n  function increment() {\n    count++;\n    updateDisplay();\n  }\n  function decrement() {\n    count--;\n    updateDisplay();\n  }\n  function reset() {\n    count = 0;\n    updateDisplay();\n  }\n<\/script>'
+        };
+        
+        var timeout;
+        codeEditor.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(runCode, 800);
+        });
+
+        function runCode() {
+            var code = codeEditor.value;
+            errorConsole.style.display = 'none';
+            errorConsole.innerHTML = '';
+            
+            try {
+                var bg = bgColor.value;
+                var txt = textColor.value;
+                var size = fontSize.value;
+                var css = customCSS.value;
+                
+                var fullHTML = '<!DOCTYPE html>\n<html>\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <style>\n        body {\n            background-color: ' + bg + ';\n            color: ' + txt + ';\n            font-size: ' + size + 'px;\n            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;\n            margin: 0;\n            padding: 20px;\n        }\n        ' + css + '\n    </style>\n</head>\n<body>\n    ' + code + '\n</body>\n</html>';
+                
+                var doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                doc.open();
+                doc.write(fullHTML);
+                doc.close();
+                
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function showError(message) {
+            errorConsole.style.display = 'block';
+            errorConsole.innerHTML += '<div class="console-item">❌ ' + message + '</div>';
+        }
+
+        function clearPreview() {
+            var doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            doc.open();
+            doc.write('<body style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; color: #999;">Preview cleared. Write code and click Run.</body>');
+            doc.close();
+            errorConsole.style.display = 'none';
+            errorConsole.innerHTML = '';
+        }
+
+        function clearCode() {
+            if (confirm('Clear all code?')) {
+                codeEditor.value = '';
+                clearPreview();
+            }
+        }
+
+        function updateStyles() {
+            runCode();
+        }
+
+        function downloadCode() {
+            var code = codeEditor.value;
+            var bg = bgColor.value;
+            var txt = textColor.value;
+            var size = fontSize.value;
+            var css = customCSS.value;
+            
+            var fullHTML = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>My JavaScript Project</title>\n    <style>\n        body {\n            background-color: ' + bg + ';\n            color: ' + txt + ';\n            font-size: ' + size + 'px;\n            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;\n            margin: 0;\n            padding: 20px;\n        }\n        ' + css + '\n    </style>\n</head>\n<body>\n' + code + '\n</body>\n</html>';
+            
+            var blob = new Blob([fullHTML], { type: 'text/html' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'my-project.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function loadTemplate(template) {
+            if (templates[template]) {
+                codeEditor.value = templates[template];
+                runCode();
+            }
+        }
+
+        document.getElementById('btnHello').addEventListener('click', function() { loadTemplate('hello'); });
+        document.getElementById('btnCalculator').addEventListener('click', function() { loadTemplate('calculator'); });
+        document.getElementById('btnTodo').addEventListener('click', function() { loadTemplate('todo'); });
+        document.getElementById('btnAnimation').addEventListener('click', function() { loadTemplate('animation'); });
+        document.getElementById('btnCounter').addEventListener('click', function() { loadTemplate('counter'); });
+        document.getElementById('btnRun').addEventListener('click', runCode);
+        document.getElementById('btnRunHeader').addEventListener('click', runCode);
+        document.getElementById('btnClearPreview').addEventListener('click', clearPreview);
+        document.getElementById('btnClearCode').addEventListener('click', clearCode);
+        document.getElementById('btnDownload').addEventListener('click', downloadCode);
+        
+        bgColor.addEventListener('change', updateStyles);
+        textColor.addEventListener('change', updateStyles);
+        fontSize.addEventListener('change', updateStyles);
+        customCSS.addEventListener('change', updateStyles);
+        
+        window.addEventListener('load', function() {
+            loadTemplate('hello');
+        });
+    </script>
+</body>
+</html>
